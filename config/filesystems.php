@@ -59,7 +59,23 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        // config/filesystems.php
 
+
+        // ... other disks like 'local', 'public', 's3' ...
+
+        'do_spaces' => [
+            'driver' => 's3',
+            'key' => env('DO_SPACES_KEY'),
+            'secret' => env('DO_SPACES_SECRET'),
+            'region' => env('DO_SPACES_REGION'),
+            'bucket' => env('DO_SPACES_BUCKET'),
+            'endpoint' => env('DO_SPACES_ENDPOINT'), // Use the custom endpoint
+            'url' => env('DO_SPACES_URL'),
+            'visibility' => 'public', // Set default visibility for uploaded files
+            // IMPORTANT: The path style access is usually required for DO Spaces
+            'use_path_style_endpoint' => true, 
+        ],
     ], 
 
     /*
