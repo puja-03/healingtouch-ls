@@ -7,7 +7,11 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 use Storage;
+use Livewire\Attributes\Layout;
 
+
+#[Layout('layouts.admin')]
+#[Title('Course Form')]
 class CourseForm extends Component
 {
     use WithFileUploads;
@@ -210,7 +214,6 @@ class CourseForm extends Component
         $this->uploadProgress = 0;
         $this->uploadError = null;
     }
-
     public function render()
     {
         return view('livewire.admin.course-form')->layout('layouts.admin');

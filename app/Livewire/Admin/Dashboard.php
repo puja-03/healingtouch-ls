@@ -4,7 +4,7 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use App\Models\Course;
-
+#[Title('Admin Dashboard')]
 class Dashboard extends Component
 {
     public function render()

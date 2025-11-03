@@ -6,7 +6,7 @@ use App\Models\Course;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
-
+#[Title('Course List')]
 class CourseList extends Component
 {
     use WithPagination;

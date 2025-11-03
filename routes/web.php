@@ -24,12 +24,23 @@ Route::post('/logout', function (Request $request) {
 	return redirect()->route('login');
 })->name('logout');
 
-// Admin routes - require authentication
-Route::middleware('auth')->group(function () {
-	Route::get('/', Dashboard::class)->name('admin.dashboard');
-	Route::get('/courses', CourseList::class)->name('admin.courses');
-	Route::get('/courses/create', CourseForm::class)->name('admin.courses.create');
-	Route::get('/courses/{courseId}/edit', CourseForm::class)->name('admin.courses.edit');
+Route::middleware(['auth'])->group(function () {
+    // Admin Routes
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/', App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
+        Route::get('/courses', CourseList::class)->name('admin.courses');
+        Route::get('/courses/create', CourseForm::class)->name('admin.courses.create');
+        Route::get('/courses/{courseId}/edit', CourseForm::class)->name('admin.courses.edit');
+
+    });
+
+    // Instructor Routes
+    Route::middleware(['instructor'])->group(function () {
+        Route::get('/', App\Livewire\Instructor\Dashboard::class)->name('instructor.dashboard');
+    });
+
+    // User Routes
+    Route::get('/dashboard', App\Livewire\User\Dashboard::class)->name('user.dashboard');
 });
 
 
