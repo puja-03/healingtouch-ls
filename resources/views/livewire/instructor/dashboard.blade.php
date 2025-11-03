@@ -6,7 +6,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-primary-50 p-6 rounded-lg">
                         <h3 class="text-lg font-medium text-primary-700">My Courses</h3>
-                        <p class="text-3xl font-bold text-primary-800 mt-2">{{ \App\Models\Course::where('instructor_id', auth()->id())->count() }}</p>
                     </div>
                     <div class="bg-primary-50 p-6 rounded-lg">
                         <h3 class="text-lg font-medium text-primary-700">Total Students</h3>

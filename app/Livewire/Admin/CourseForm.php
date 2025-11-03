@@ -39,7 +39,8 @@ class CourseForm extends Component
             'description' => 'nullable',
             'price' => 'required|numeric|min:0',
             'featured_image' => $this->courseId ? 'nullable|image|max:1024' : 'nullable|image|max:1024',
-            'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:102400',
+            // Max file size validation is handled here
+            'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:102400', 
             'video_url' => 'nullable',
             'content' => 'nullable',
             'order' => 'required|integer|min:0',
@@ -65,17 +66,8 @@ class CourseForm extends Component
 
     public function save()
     {
-        $this->validate([
-            'title' => 'required|min:3',
-            'description' => 'nullable',
-            'price' => 'required|numeric|min:0',
-            'featured_image' => $this->courseId ? 'nullable|image|max:1024' : 'nullable|image|max:1024',
-            'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:102400', // max 100MB
-            'content' => 'nullable',
-            'order' => 'required|integer|min:0',
-            'is_published' => 'boolean'
-        ]);
-        
+        $this->validate(); // Validation using the rules() method
+
         try {
             $this->uploadProgress = 0;
             
@@ -89,7 +81,7 @@ class CourseForm extends Component
                 'order' => $this->order,
             ];
 
-            // Handle featured image upload
+            // --- Handle featured image upload (Logic is already correct) ---
             if ($this->featured_image) {
                 try {
                     $imageName = time() . '_' . Str::random(10) . '.' . $this->featured_image->getClientOriginalExtension();
@@ -97,7 +89,7 @@ class CourseForm extends Component
                     
                     $path = Storage::disk('do_spaces')->putFileAs(
                         $folder,
-                        $this->featured_image,
+                        $this->featured_image, // Passing UploadedFile object directly
                         $imageName,
                         'public'
                     );
@@ -105,63 +97,49 @@ class CourseForm extends Component
                     $data['featured_image'] = Storage::disk('do_spaces')->url($path);
                     
                     if ($this->courseId && $this->existingImage) {
-                        Storage::disk('do_spaces')->delete($this->existingImage);
+                        // Attempt to delete old image based on its URL path
+                        $oldImagePath = parse_url($this->existingImage, PHP_URL_PATH);
+                        if ($oldImagePath) {
+                            Storage::disk('do_spaces')->delete(ltrim($oldImagePath, '/'));
+                        }
                     }
                     
                     $this->uploadProgress = 50;
                 } catch (\Exception $e) {
                     session()->flash('error', 'Image upload failed: ' . $e->getMessage());
+                    \Log::error('Image upload failed: ' . $e->getMessage());
                     return;
                 }
             }
 
-            // Handle video upload with proper error handling and validation
+            // --- Handle video upload (CORRECTED LOGIC) ---
             if ($this->video) {
                 try {
-                    // Validate video size
-                    if ($this->video->getSize() > $this->maxFileSize * 1024) {
-                        throw new \Exception('Video file size exceeds the maximum limit of 100MB');
-                    }
-
-                    $videoFile = $this->video;
+                    $videoFile = $this->video; // This is the Livewire UploadedFile object
                     $fileName = time() . '_' . Str::random(10) . '.' . $videoFile->getClientOriginalExtension();
-                    
-                    // Ensure the folder exists and is properly named
                     $folder = 'course-videos';
 
                     // Set upload progress to indicate start
                     $this->uploadProgress = 10;
-
-                    // First store locally to ensure file is valid
-                    $localPath = $videoFile->storeAs('temp', $fileName, 'local');
-                    $this->uploadProgress = 30;
-
-                    if (!Storage::disk('local')->exists($localPath)) {
-                        throw new \Exception('Failed to process video file');
-                    }
-
-                    // Now upload to DigitalOcean Spaces
-                    $this->uploadProgress = 50;
                     
+                    // UPLOAD DIRECTLY to DigitalOcean Spaces
                     $path = Storage::disk('do_spaces')->putFileAs(
                         $folder,
-                        Storage::disk('local')->path($localPath),
+                        $videoFile, // PASS THE FILE OBJECT DIRECTLY
                         $fileName,
                         'public'
                     );
 
                     if (!$path) {
-                        throw new \Exception('Failed to upload to DigitalOcean');
+                        throw new \Exception('Failed to upload video to DigitalOcean. Check credentials.');
                     }
-
-                    // Clean up local temp file
-                    Storage::disk('local')->delete($localPath);
                     
                     // Get the full URL
                     $data['video_url'] = Storage::disk('do_spaces')->url($path);
                     
                     // If we're updating, remove old video
                     if ($this->courseId && $this->video_url) {
+                        // Attempt to delete old video based on its URL path
                         $oldPath = parse_url($this->video_url, PHP_URL_PATH);
                         if ($oldPath) {
                             Storage::disk('do_spaces')->delete(ltrim($oldPath, '/'));
@@ -170,6 +148,7 @@ class CourseForm extends Component
 
                     $this->uploadProgress = 100;
                     session()->flash('success', 'Video uploaded successfully!');
+
                 } catch (\Exception $e) {
                     \Log::error('Video upload failed: ' . $e->getMessage());
                     session()->flash('error', 'Video upload failed: ' . $e->getMessage());
@@ -177,7 +156,9 @@ class CourseForm extends Component
                     return;
                 }
             }
+            // --- End Video Upload ---
 
+            // Save/Update Course
             if ($this->courseId) {
                 Course::find($this->courseId)->update($data);
                 session()->flash('success', 'Course updated successfully with all uploads.');
@@ -198,24 +179,21 @@ class CourseForm extends Component
 
     public function updatedFeaturedImage()
     {
-        $this->validate([
-            'featured_image' => 'image|max:1024'
-        ]);
+        $this->validate(['featured_image' => 'image|max:1024']);
         $this->temporaryUrl = $this->featured_image->temporaryUrl();
     }
 
     public function updatedVideo()
     {
-        $this->validate([
-            'video' => 'file|mimetypes:video/mp4,video/quicktime|max:102400'
-        ]);
+        $this->validate(['video' => 'file|mimetypes:video/mp4,video/quicktime|max:102400']);
         
         // Reset progress when new video is selected
         $this->uploadProgress = 0;
         $this->uploadError = null;
     }
+
     public function render()
     {
-        return view('livewire.admin.course-form')->layout('layouts.admin');
+        return view('livewire.admin.course-form');
     }
 }

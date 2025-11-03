@@ -35,6 +35,10 @@ class Register extends Component
             'name' => $this->name,
             'email' => $this->email,
             'password' => Hash::make($this->password),
+            'role' => 'user', 
+            'is_user' => true,
+            'is_admin' => false,
+            'is_instructor' => false,
         ]);
 
         Auth::login($user);
