@@ -9,9 +9,12 @@
 </head>
 <body class="bg-gray-100">
     <div class="min-h-screen flex">
+        @auth
+            @include('partials.admin-sidebar')
+        @endauth
+
         <!-- Main Content -->
         <div class="flex-1">
-            
             <main class="py-6 sm:px-6 lg:px-8">
                 {{ $slot }}
             </main>

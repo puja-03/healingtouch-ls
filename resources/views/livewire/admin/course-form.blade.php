@@ -1,9 +1,5 @@
-<div class="px-4 sm:px-6 lg:px">
-    <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-800">Course Management</h1>
-    </div>
-
-    <div class="bg-white p-10 rounded-2xl card-shadow overflow-hidden">
+<div class="sm:px-6">
+    <div class="bg-white  rounded-2xl card-shadow overflow-hidden">
         <div class="p-8">
             <!-- Header with icon -->
             <div class="flex items-center mb-8">
