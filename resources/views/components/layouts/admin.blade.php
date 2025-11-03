@@ -10,7 +10,7 @@
 <body class="bg-gray-100">
     <div class="min-h-screen flex">
         @auth
-            @include('partials.admin-sidebar')
+            @include('components.admin-sidebar')
         @endauth
 
         <!-- Main Content -->

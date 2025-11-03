@@ -4,7 +4,11 @@ namespace App\Livewire\Auth;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout; 
 
+#[Title ('Login')]
+#[Layout ('components.layouts.app')]
 class Login extends Component
 {
     public $email;
@@ -33,6 +37,6 @@ class Login extends Component
 
     public function render()
     {
-        return view('livewire.auth.login')->layout('layouts.admin');
+        return view('livewire.auth.login');
     }
 }

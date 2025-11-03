@@ -6,7 +6,11 @@ use Livewire\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout; 
 
+#[Title ('Register')]
+#[Layout ('components.layouts.app')]
 class Register extends Component
 {
     public $name;
@@ -40,6 +44,6 @@ class Register extends Component
 
     public function render()
     {
-        return view('livewire.auth.register')->layout('layouts.admin');
+        return view('livewire.auth.register');
     }
 }

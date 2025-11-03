@@ -8,9 +8,9 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 use Storage;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
-
-#[Layout('layouts.admin')]
+#[Layout('components.layouts.admin')]
 #[Title('Course Form')]
 class CourseForm extends Component
 {

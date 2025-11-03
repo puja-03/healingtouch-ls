@@ -4,7 +4,11 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use App\Models\Course;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
+
 #[Title('Admin Dashboard')]
+#[Layout('components.layouts.admin')]
 class Dashboard extends Component
 {
     public function render()
@@ -18,6 +22,6 @@ class Dashboard extends Component
             'publishedCourses' => $publishedCourses,
             'coursesWithVideos' => $coursesWithVideos,
             'recentCourses' => Course::latest()->take(5)->get()
-        ])->layout('layouts.admin');
+        ]);
     }
 }
