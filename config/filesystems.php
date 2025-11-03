@@ -47,6 +47,21 @@ return [
             'report' => false,
         ],
 
+        'do_spaces' => [
+            'driver' => 's3',
+            'key' => env('DO_SPACES_KEY'),
+            'secret' => env('DO_SPACES_SECRET'),
+            'region' => env('DO_SPACES_REGION'),
+            'bucket' => env('DO_SPACES_BUCKET'),
+            'folder' => env('DO_SPACES_FOLDER', ''),
+            'cdn_endpoint' => env('DO_SPACES_CDN_ENDPOINT'),
+            'url' => env('DO_SPACES_URL'),
+            'endpoint' => env('DO_SPACES_ENDPOINT'),
+            'use_path_style_endpoint' => env('DO_SPACES_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -64,18 +79,18 @@ return [
 
         // ... other disks like 'local', 'public', 's3' ...
 
-        'do_spaces' => [
-            'driver' => 's3',
-            'key' => env('DO_SPACES_KEY'),
-            'secret' => env('DO_SPACES_SECRET'),
-            'region' => env('DO_SPACES_REGION'),
-            'bucket' => env('DO_SPACES_BUCKET'),
-            'endpoint' => env('DO_SPACES_ENDPOINT'), // Use the custom endpoint
-            'url' => env('DO_SPACES_URL'),
-            'visibility' => 'public', // Set default visibility for uploaded files
-            // IMPORTANT: The path style access is usually required for DO Spaces
-            'use_path_style_endpoint' => true, 
-        ],
+        // 'do_spaces' => [
+        //     'driver' => 's3',
+        //     'key' => env('DO_SPACES_KEY'),
+        //     'secret' => env('DO_SPACES_SECRET'),
+        //     'region' => env('DO_SPACES_REGION'),
+        //     'bucket' => env('DO_SPACES_BUCKET'),
+        //     'endpoint' => env('DO_SPACES_ENDPOINT'), // Use the custom endpoint
+        //     'url' => env('DO_SPACES_URL'),
+        //     'visibility' => 'public', // Set default visibility for uploaded files
+        //     // IMPORTANT: The path style access is usually required for DO Spaces
+        //     'use_path_style_endpoint' => true, 
+        // ],
     ], 
 
     /*

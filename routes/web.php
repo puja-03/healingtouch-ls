@@ -5,22 +5,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use App\Http\Controllers\VideoUploadsController;
+use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\VideoUpload;
+use App\Livewire\Admin\CourseList; 
+use App\Livewire\Admin\CourseForm;
 
-// Route::post('/', function (Request $request) {
-//     $file = $request->file(key:'image');
-//     $path = $file->storePubliclyAs(path:'youtube-tutorials/'.$file->getClientOriginalName());
-//     // $path = Storage::putFileAs('youtube-tutorials', $file, $file->getClientOriginalName());
-//     // Storage::setVisibility($path, 'public');
-//     // Storage::delete($path);
-//     return response()->json([
-//         'path' => $path,
-//         'url' => Storage::url($path)
-//     ]);
-// })->withoutMiddleware([VerifyCsrfToken::class]);
-
-
-// routes/web.php
+// Route ::get('/videos/upload', [VideoUploadsController::class, 'create'])->name('video.create');
+// Route ::post('/videos/upload', [VideoUploadsController::class, 'store'])->name('video.store');
+  Route::get('/', Dashboard::class)->name('admin.dashboard');
+    Route::get('/courses', CourseList::class)->name('admin.courses');
+    Route::get('/courses/create', CourseForm::class)->name('admin.courses.create');
+    Route::get('/courses/{courseId}/edit', CourseForm::class)->name('admin.courses.edit');
 
 
-Route::get('/upload-video', [VideoUploadsController::class, 'create'])->name('video.create');
-Route::post('/upload-video', [VideoUploadsController::class, 'store'])->name('video.store');
