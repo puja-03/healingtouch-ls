@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class Course extends Model
 {
@@ -16,11 +17,7 @@ class Course extends Model
         'description',
         'price',
         'is_published',
-        'featured_image',
         'user_id',
-        'video_url',
-        'content',
-        'order'
     ];
 
     protected $casts = [
@@ -39,8 +36,8 @@ class Course extends Model
 
     // Relationships
 
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }  
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }  
 }
