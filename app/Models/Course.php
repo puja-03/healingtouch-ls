@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Models\Chapter; 
+
 
 class Course extends Model
 {
@@ -39,5 +41,15 @@ class Course extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }  
+    } 
+
+    public function chapters()
+    {
+        return $this->hasMany(Chapter::class); 
+    }
+
+    public function instructor()
+    {
+        return $this->belongsTo(User::class, 'user_id'); 
+    } 
 }

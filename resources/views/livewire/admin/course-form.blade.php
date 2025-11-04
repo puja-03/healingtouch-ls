@@ -18,12 +18,23 @@
             </div>
 
             <!-- Success Message -->
-            @if (session()->has('message'))
+            @if (session()->has('success'))
                 <div class="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 flex items-start">
                     <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3"></i>
                     <div>
                         <p class="text-green-700 font-medium">Success!</p>
-                        <p class="text-green-600">{{ session('message') }}</p>
+                        <p class="text-green-600">{{ session('success') }}</p>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Error Message -->
+            @if (session()->has('error'))
+                <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-500 mt-0.5 mr-3"></i>
+                    <div>
+                        <p class="text-red-700 font-medium">Error!</p>
+                        <p class="text-red-600">{{ session('error') }}</p>
                     </div>
                 </div>
             @endif

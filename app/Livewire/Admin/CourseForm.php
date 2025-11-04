@@ -52,6 +52,7 @@ class CourseForm extends Component
                 'description' => $this->description,
                 'price' => $this->price,
                 'is_published' => $this->is_published,
+                'user_id' => auth()->id(), // Add the authenticated user's ID
             ];
 
             // Save/Update Course

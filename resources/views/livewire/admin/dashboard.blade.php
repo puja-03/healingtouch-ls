@@ -51,9 +51,9 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Courses with Videos</dt>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Courses with Chapters</dt>
                             <dd class="flex items-baseline">
-                                <div class="text-2xl font-semibold text-gray-900">{{ $coursesWithVideos }}</div>
+                                {{-- <div class="text-2xl font-semibold text-gray-900">{{ $coursesWithChapters }}</div> --}}
                             </dd>
                         </dl>
                     </div>
@@ -87,11 +87,7 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $course->is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                     {{ $course->is_published ? 'Published' : 'Draft' }}
                                 </span>
-                                @if($course->video_url)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        Has Video
-                                    </span>
-                                @endif
+                                
                             </div>
                         </div>
                     </li>
