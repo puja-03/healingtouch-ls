@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-
+USE App\Http\Middleware\AdminMiddleware;
 ///laravel se video uploade 
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use App\Http\Controllers\VideoUploadsController;
@@ -12,7 +12,10 @@ use App\Http\Controllers\VideoUploadsController;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\CourseList; 
 use App\Livewire\Admin\CourseForm;
-
+use App\Livewire\Admin\Chapters\ChapterIndex;
+use App\Livewire\Admin\Chapters\ChapterForm;
+use App\Livewire\Admin\Topics\TopicIndex ;
+use App\Livewire\Admin\Topics\TopicForm;
 //Instructor
 use App\Livewire\Instructor\Dashboard As InstructorDashboard;
 
@@ -34,11 +37,21 @@ Route::post('/logout', function (Request $request) {
 
 Route::middleware('auth')->group(function () {
     // Admin Routes
-    Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->prefix('admin')->group(function () {
+    Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function () {
         Route::get('/', Dashboard::class)->name('admin.dashboard');
         Route::get('/courses', CourseList::class)->name('admin.courses');
         Route::get('/courses/create', CourseForm::class)->name('admin.courses.create');
         Route::get('/courses/{courseId}/edit', CourseForm::class)->name('admin.courses.edit');
+        
+        // Chapter Routes
+        Route::get('/chapters', ChapterIndex::class)->name('admin.chapters');
+        Route::get('/chapters/create/{course_id}', ChapterForm::class)->name('admin.chapters.create');
+        Route::get('/chapters/{course_id}/edit/{chapter_id}', ChapterForm::class)->name('admin.chapters.edit');
+
+        // Topic Routes
+        Route::get('/topics', TopicIndex::class)->name('admin.topics');
+        Route::get('/topics/create/{chapters_id}', TopicForm::class)->name('admin.topics.create');
+        Route::get('/topics/{chapters_id}/edit/{topic_id}',TopicForm::class)->name('admin.topics.edit');
     });
 
     // Instructor Routes

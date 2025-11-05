@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
 use App\Models\Course;
-use App\Models\Topic;
+use App\Models\Topics;
 
 class Chapters extends Model
 {
@@ -40,6 +40,6 @@ class Chapters extends Model
 
     public function topics()
     {
-        return $this->hasMany(Topic::class); 
+        return $this->hasMany(Topics::class); 
     }
 }

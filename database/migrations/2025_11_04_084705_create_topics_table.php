@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('chapter_id')->constrained()->onDelete('cascade'); 
+            $table->foreignId('chapters_id')->constrained()->onDelete('cascade'); 
             $table->string('topic_title');
             $table->text('topic_slug')->unique();
             $table->text('content')->nullable(); 
