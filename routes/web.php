@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
         
         // Chapter Routes
         Route::get('/chapters', ChapterIndex::class)->name('admin.chapters');
-        Route::get('/chapters/create/{course_id}', ChapterForm::class)->name('admin.chapters.create');
+        Route::get('/chapters/create', ChapterForm::class)->name('admin.chapters.create');
         Route::get('/chapters/{course_id}/edit/{chapter_id}', ChapterForm::class)->name('admin.chapters.edit');
 
         // Topic Routes

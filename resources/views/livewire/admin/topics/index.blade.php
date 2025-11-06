@@ -17,7 +17,7 @@
                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
         </div>
         <div class="flex-1">
-            <select wire:model="chaptersId" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
+            <select wire:model="chapterId" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500">
                 <option value="">All Chapters</option>
                 @foreach($chapters as $chapter)
                     <option value="{{ $chapter->id }}">{{ $chapter->chapter_title }}</option>
@@ -93,7 +93,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+             chapters           <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                             No topics found
                         </td>
                     </tr>

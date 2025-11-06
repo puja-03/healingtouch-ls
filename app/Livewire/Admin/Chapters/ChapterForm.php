@@ -25,12 +25,14 @@ class ChapterForm extends Component
         'order_index' => 'required|numeric|min:0',
     ];
 
-    public function mount($courseId = null, $chapterId = null)
+    // Match route parameter names exactly to ensure Livewire passes them into mount
+    public function mount($course_id = null, $chapter_id = null)
     {
-        $this->courseId = $courseId;
-        $this->selectedCourse = $courseId;
-        if ($chapterId) {
-            $this->loadChapter($chapterId);
+        $this->courseId = $course_id;
+        $this->selectedCourse = $course_id;
+
+        if ($chapter_id) {
+            $this->loadChapter($chapter_id);
         }
     }
 
