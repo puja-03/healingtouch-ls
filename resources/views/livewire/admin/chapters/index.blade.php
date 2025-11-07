@@ -51,7 +51,7 @@
                             <div class="text-sm text-gray-900">{{ $chapter->topics->count() }} topics</div>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium space-x-2">
-                            <a href="{{ route('admin.chapters.edit', ['course_id' => $chapter->course_id, 'chapter_id' => $chapter->id]) }}" 
+                            <a href="{{ route('admin.chapters.edit', $chapter->id ) }}" 
                                 class="bg-pink-100 text-pink-700 px-3 py-1 rounded hover:bg-pink-200">
                                 Edit
                             </a>

@@ -82,7 +82,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm font-medium space-x-2">
-                            <a href="{{ route('admin.topics.edit', ['chapters_id' => $topic->chapters_id, 'topic_id' => $topic->id]) }}"
+                            <a href="{{ route('admin.topics.edit', $topic->id) }}"
                                 class="bg-pink-100 text-pink-700 px-3 py-1 rounded hover:bg-pink-200">
                                 Edit
                             </a>

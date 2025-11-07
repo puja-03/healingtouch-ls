@@ -27,66 +27,102 @@ class TopicForm extends Component
     public $currentVideo;
     public $selectedChapter = null;
     public $selectedCourse = null;
-    public $availableChapters = [];
+    public $chapters = [];
     public $step = 1;
 
-    protected function rules()
-    {
-        return [
-            'topic_title' => 'required|min:3',
-            'content' => 'nullable',
-            'order_index' => 'required|numeric|min:0',
-        ];
-    }
+    protected $rules = [
+        'selectedCourse' => 'required_if:step,1',
+        'selectedChapter' => 'required_if:step,1',
+        'topic_title' => 'required|min:3',
+        'content' => 'nullable',
+        'order_index' => 'required|numeric|min:0',
+    ];
+
+    protected $messages = [
+        'selectedCourse.required_if' => 'Please select a course',
+        'selectedChapter.required_if' => 'Please select a chapter',
+    ];
 
     public function mount($chapters_id = null, $topic_id = null)
     {
         $this->chaptersId = $chapters_id;
-        $this->selectedChapter = $chapters_id;
+
         if ($topic_id) {
             $this->loadTopic($topic_id);
+        } elseif ($chapters_id) {
+            $this->preloadFromChapter($chapters_id);
+        }
+    }
+
+    protected function preloadFromChapter($chapter_id)
+    {
+        $chapter = Chapters::with('course')->find($chapter_id);
+        if ($chapter) {
+            $this->selectedChapter = $chapter->id;
+            $this->selectedCourse = $chapter->course_id;
+            $this->loadChapters(); // Load chapters for the course
         }
     }
 
     public function loadTopic($id)
     {
-        $topic = Topics::findOrFail($id);
+        $topic = Topics::with('chapter.course')->findOrFail($id);
         $this->topicId = $topic->id;
         $this->topic_title = $topic->topic_title;
         $this->content = $topic->content;
         $this->order_index = $topic->order_index;
         $this->currentVideo = $topic->video_url;
         $this->selectedChapter = $topic->chapters_id;
-        $chapter = Chapters::find($topic->chapters_id);
-        if ($chapter) {
-            $this->selectedCourse = $chapter->course_id ?? null;
-            $this->availableChapters = Chapters::where('course_id', $this->selectedCourse)
-                ->orderBy('chapter_title')
-                ->get();
+        
+        if ($topic->chapter) {
+            $this->selectedCourse = $topic->chapter->course_id;
+            $this->loadChapters();
         }
     }
 
     public function nextStep()
     {
-        if ($this->step < 3) $this->step++;
+        if ($this->step === 1) {
+            $this->validateOnly('selectedCourse');
+            $this->validateOnly('selectedChapter');
+        }
+        
+        if ($this->step < 3) {
+            $this->step++;
+        }
     }
 
     public function prevStep()
     {
-        if ($this->step > 1) $this->step--;
+        if ($this->step > 1) {
+            $this->step--;
+        }
     }
 
     public function updatedSelectedCourse($courseId)
     {
-        if (!empty($courseId)) {
-            $this->availableChapters = Chapters::where('course_id', $courseId)
+        $this->selectedChapter = null;
+        $this->loadChapters();
+    }
+
+    protected function loadChapters()
+    {
+        if ($this->selectedCourse) {
+            $this->chapters = Chapters::where('course_id', $this->selectedCourse)
+                ->orderBy('order_index')
                 ->orderBy('chapter_title')
-                ->get();
-            $this->selectedChapter = null;
+                ->get()
+                ->toArray();
         } else {
-            $this->availableChapters = [];
-            $this->selectedChapter = null;
+            $this->chapters = [];
         }
+        
+        // Debug output
+        logger('Chapters loaded:', [
+            'course' => $this->selectedCourse,
+            'chapters_count' => count($this->chapters),
+            'chapters' => $this->chapters
+        ]);
     }
 
     public function save()
@@ -103,26 +139,7 @@ class TopicForm extends Component
             ];
 
             if ($this->video) {
-                $chaptersIdForFolder = $this->selectedChapter ?? $this->chaptersId;
-                $chapter = Chapters::find($chaptersIdForFolder);
-                $chapterFolder = $chapter ? Str::slug($chapter->chapter_title) : 'uncategorized';
-                $fileName = time() . '_' . Str::random(10) . '.' . $this->video->getClientOriginalExtension();
-
-                if ($this->currentVideo) {
-                    $oldPath = parse_url($this->currentVideo, PHP_URL_PATH);
-                    if ($oldPath) {
-                        Storage::disk('do_spaces')->delete(ltrim($oldPath, '/'));
-                    }
-                }
-
-                $path = Storage::disk('do_spaces')->putFileAs(
-                    "videos/{$chapterFolder}",
-                    $this->video,
-                    $fileName,
-                    'public'
-                );
-
-                $data['video_url'] = Storage::disk('do_spaces')->url($path);
+                $data['video_url'] = $this->uploadVideo();
             }
 
             if ($this->topicId) {
@@ -134,20 +151,47 @@ class TopicForm extends Component
             }
 
             session()->flash('success', $message);
-            return redirect()->route('admin.topics', ['chapters_id' => $this->chaptersId]);
+            return redirect()->route('admin.topics', ['chapters_id' => $this->selectedChapter]);
         } catch (\Exception $e) {
             session()->flash('error', 'Error: ' . $e->getMessage());
+            logger('Topic save error: ' . $e->getMessage());
+        }
+    }
+
+    protected function uploadVideo()
+    {
+        $chapter = Chapters::find($this->selectedChapter);
+        $chapterFolder = $chapter ? Str::slug($chapter->chapter_title) : 'uncategorized';
+        $fileName = time() . '_' . Str::random(10) . '.' . $this->video->getClientOriginalExtension();
+
+        if ($this->currentVideo) {
+            $this->deleteOldVideo();
+        }
+
+        $path = Storage::disk('do_spaces')->putFileAs(
+            "videos/{$chapterFolder}",
+            $this->video,
+            $fileName,
+            'public'
+        );
+
+        return Storage::disk('do_spaces')->url($path);
+    }
+
+    protected function deleteOldVideo()
+    {
+        $oldPath = parse_url($this->currentVideo, PHP_URL_PATH);
+        if ($oldPath) {
+            Storage::disk('do_spaces')->delete(ltrim($oldPath, '/'));
         }
     }
 
     public function render()
     {
         $courses = Course::orderBy('title')->get();
-        $chapters = $this->availableChapters; 
-
+        
         return view('livewire.admin.topics.topic-form', [
             'courses' => $courses,
-            'chapters' => $chapters,
         ]);
     }
 }

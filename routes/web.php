@@ -47,12 +47,12 @@ Route::middleware('auth')->group(function () {
         // Chapter Routes
         Route::get('/chapters', ChapterIndex::class)->name('admin.chapters');
         Route::get('/chapters/create', ChapterForm::class)->name('admin.chapters.create');
-        Route::get('/chapters/{course_id}/edit/{chapter_id}', ChapterForm::class)->name('admin.chapters.edit');
+        Route::get('/chapters/{chapter_id}/edit', ChapterForm::class)->name('admin.chapters.edit');
 
         // Topic Routes
         Route::get('/topics', TopicIndex::class)->name('admin.topics');
         Route::get('/topics/create', TopicForm::class)->name('admin.topics.create');
-        Route::get('/topics/{chapters_id}/edit/{topic_id}',TopicForm::class)->name('admin.topics.edit');
+        Route::get('/topics/{topic_id}/edit', TopicForm::class)->name('admin.topics.edit');
     });
 
     // Instructor Routes

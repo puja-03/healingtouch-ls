@@ -3,8 +3,7 @@
         <h2 class="text-2xl font-bold text-gray-900">{{ $topicId ? 'Edit Topic' : 'Create New Topic' }}</h2>
         <p class="mt-1 text-sm text-gray-600">Follow the steps to create or edit a topic.</p>
     </div>
-
-    {{-- Stepper Header --}}
+    
     <div class="flex items-center justify-between mb-8 relative">
         @foreach ([1 => 'Course & Chapter', 2 => 'Topic Details', 3 => 'Upload Video'] as $index => $label)
             <div class="flex flex-col items-center flex-1">
@@ -20,39 +19,80 @@
                         </div>
                     @endif
                 </div>
-                <span
-                    class="mt-2 text-sm font-medium {{ $step >= $index ? 'text-pink-600' : 'text-gray-500' }}">{{ $label }}</span>
             </div>
         @endforeach
-    </div>
+        </div>
+
 
     <form wire:submit.prevent="save" class="space-y-8">
 
-        {{-- STEP 1: Select Course and Chapter --}}
+        {{-- STEP 1: Course & Chapter Selection --}}
         @if($step === 1)
         <div class="bg-pink-50 p-6 rounded-xl shadow-inner">
             <h3 class="text-lg font-semibold text-pink-700 mb-4">Step 1: Select Course and Chapter</h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <select wire:model="selectedCourse">
-                    <option value="">Choose a course</option>
-                    @foreach($courses as $c)
-                        <option value="{{ $c->id }}">{{ $c->title ?? $c->course_title }}</option>
-                    @endforeach
-                </select>
+                {{-- Course Selection --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Course <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        wire:model="selectedCourse" 
+                        wire:change="$refresh"
+                        class="w-full rounded-lg border-gray-300 focus:ring-pink-300 focus:border-pink-500"
+                    >
+                        <option value="">-- Select Course --</option>
+                        @foreach($courses as $course)
+                            <option value="{{ $course->id }}">
+                                {{ $course->title ?? $course->course_title ?? $course->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('selectedCourse') 
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p> 
+                    @enderror
+                </div>
 
-                <select wire:model="selectedChapter">
-                    <option value="">Choose a chapter</option>
-                    @foreach($chapters as $chapter)
-                        <option value="{{ $chapter->id }}">{{ $chapter->chapter_title }}</option>
-                    @endforeach
-                </select>
-
+                {{-- Chapter Selection --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Chapter <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        wire:model="selectedChapter"
+                        class="w-full rounded-lg border-gray-300 focus:ring-pink-300 focus:border-pink-500"
+                        @if(!$selectedCourse) disabled @endif
+                    >
+                        <option value="">-- Select Chapter --</option>
+                        @if($selectedCourse)
+                            @forelse($chapters as $chapter)
+                                <option value="{{ $chapter['id'] }}">
+                                    {{ $chapter['chapter_title'] }}
+                                </option>
+                            @empty
+                                <option value="" disabled>No chapters found for this course</option>
+                            @endforelse
+                        @else
+                            <option value="" disabled>Please select a course first</option>
+                        @endif
+                    </select>
+                    @error('selectedChapter') 
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p> 
+                    @enderror
+                    
+                    @if($selectedCourse && empty($chapters))
+                        <p class="text-orange-600 text-sm mt-2">
+                            ⚠️ No chapters available for the selected course. 
+                            Please add chapters to this course first.
+                        </p>
+                    @endif
+                </div>
             </div>
         </div>
         @endif
 
-        {{-- STEP 2: Topic Details --}}
+               {{-- STEP 2: Topic Details --}}
         @if($step === 2)
         <div class="bg-pink-50 p-6 rounded-xl shadow-inner">
             <h3 class="text-lg font-semibold text-pink-700 mb-4">Step 2: Topic Details</h3>
@@ -90,6 +130,12 @@
                 </label>
             </div>
 
+            @if($video)
+                <div class="mt-4">
+                    <p class="text-sm font-medium text-gray-700">Video selected: {{ $video->getClientOriginalName() }}</p>
+                </div>
+            @endif
+
             @if($currentVideo)
                 <div class="mt-4">
                     <p class="text-sm font-medium text-gray-700 mb-1">Current Video:</p>
@@ -100,7 +146,7 @@
         @endif
 
         {{-- Navigation Buttons --}}
-        <div class="flex justify-between items-center mt-8">
+         <div class="flex justify-between items-center mt-8">
             @if($step > 1)
                 <button type="button" wire:click="prevStep"
                     class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
