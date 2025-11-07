@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-USE App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\InstructorMiddleware;
 ///laravel se video uploade 
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use App\Http\Controllers\VideoUploadsController;
@@ -50,12 +51,12 @@ Route::middleware('auth')->group(function () {
 
         // Topic Routes
         Route::get('/topics', TopicIndex::class)->name('admin.topics');
-        Route::get('/topics/create/{chapters_id}', TopicForm::class)->name('admin.topics.create');
+        Route::get('/topics/create', TopicForm::class)->name('admin.topics.create');
         Route::get('/topics/{chapters_id}/edit/{topic_id}',TopicForm::class)->name('admin.topics.edit');
     });
 
     // Instructor Routes
-    Route::middleware(\App\Http\Middleware\InstructorMiddleware::class)->prefix('instructor')->group(function () {
+    Route::middleware(InstructorMiddleware::class)->prefix('instructor')->group(function () {
         Route::get('/', InstructorDashboard::class)->name('instructor.dashboard');
     });
 

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Topics;
 
 use App\Models\Topics;
 use App\Models\Chapters;
+use App\Models\Course;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
@@ -24,25 +25,26 @@ class TopicForm extends Component
     public $video;
     public $order_index = 0;
     public $currentVideo;
-    public $selectedChapter;
+    public $selectedChapter = null;
+    public $selectedCourse = null;
+    public $availableChapters = [];
+    public $step = 1;
 
     protected function rules()
     {
-        // $videoRule = $this->topicId ? 'nullable' : 'required';
         return [
             'topic_title' => 'required|min:3',
             'content' => 'nullable',
-            // 'video' => $videoRule . '|file|mimetypes:video/mp4,video/quicktime|max:102400',
             'order_index' => 'required|numeric|min:0',
         ];
     }
 
-    public function mount($chaptersId = null, $topicId = null)
+    public function mount($chapters_id = null, $topic_id = null)
     {
-        $this->chaptersId = $chaptersId;
-        $this->selectedChapter = $chaptersId;
-        if ($topicId) {
-            $this->loadTopic($topicId);
+        $this->chaptersId = $chapters_id;
+        $this->selectedChapter = $chapters_id;
+        if ($topic_id) {
+            $this->loadTopic($topic_id);
         }
     }
 
@@ -55,7 +57,38 @@ class TopicForm extends Component
         $this->order_index = $topic->order_index;
         $this->currentVideo = $topic->video_url;
         $this->selectedChapter = $topic->chapters_id;
-        $this->chaptersId = $topic->chapters_id;
+        // set selectedCourse if chapter has one
+        $chapter = Chapters::find($topic->chapters_id);
+        if ($chapter) {
+            $this->selectedCourse = $chapter->course_id ?? null;
+            // preload chapters for that course
+            $this->availableChapters = Chapters::where('course_id', $this->selectedCourse)
+                ->orderBy('chapter_title')
+                ->get();
+        }
+    }
+
+    public function nextStep()
+    {
+        if ($this->step < 3) $this->step++;
+    }
+
+    public function prevStep()
+    {
+        if ($this->step > 1) $this->step--;
+    }
+
+    public function updatedSelectedCourse($courseId)
+    {
+        if (!empty($courseId)) {
+            $this->availableChapters = Chapters::where('course_id', $courseId)
+                ->orderBy('chapter_title')
+                ->get();
+            $this->selectedChapter = null;
+        } else {
+            $this->availableChapters = [];
+            $this->selectedChapter = null;
+        }
     }
 
     public function save()
@@ -71,15 +104,12 @@ class TopicForm extends Component
                 'chapters_id' => $this->selectedChapter,
             ];
 
-            // Handle video upload
             if ($this->video) {
-                // Determine which chapter to use for folder naming: prefer selectedChapter (from select), fallback to mount chaptersId
                 $chaptersIdForFolder = $this->selectedChapter ?? $this->chaptersId;
                 $chapter = Chapters::find($chaptersIdForFolder);
                 $chapterFolder = $chapter ? Str::slug($chapter->chapter_title) : 'uncategorized';
                 $fileName = time() . '_' . Str::random(10) . '.' . $this->video->getClientOriginalExtension();
 
-                // Delete old video if exists
                 if ($this->currentVideo) {
                     $oldPath = parse_url($this->currentVideo, PHP_URL_PATH);
                     if ($oldPath) {
@@ -87,7 +117,6 @@ class TopicForm extends Component
                     }
                 }
 
-                // Upload new video
                 $path = Storage::disk('do_spaces')->putFileAs(
                     "videos/{$chapterFolder}",
                     $this->video,
@@ -108,7 +137,6 @@ class TopicForm extends Component
 
             session()->flash('success', $message);
             return redirect()->route('admin.topics', ['chapters_id' => $this->chaptersId]);
-
         } catch (\Exception $e) {
             session()->flash('error', 'Error: ' . $e->getMessage());
         }
@@ -116,9 +144,12 @@ class TopicForm extends Component
 
     public function render()
     {
+        $courses = Course::orderBy('title')->get();
+        $chapters = $this->availableChapters; // only chapters for selected course
+
         return view('livewire.admin.topics.topic-form', [
-            'chapter' => Chapters::find($this->chaptersId),
-            'chapters' => Chapters::all() 
+            'courses' => $courses,
+            'chapters' => $chapters,
         ]);
     }
 }

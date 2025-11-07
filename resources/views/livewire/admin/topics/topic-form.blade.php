@@ -1,101 +1,126 @@
-<div class="p-6 bg-white rounded-lg shadow-md">
-    <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-900">
-            {{ $topicId ? 'Edit Topic' : 'Create New Topic' }}
-        </h2>
-        <p class="mt-1 text-sm text-gray-600">
-            {{ $topicId ? 'Update topic information' : 'Add a new topic to your chapter' }}
-        </p>
+<div class="p-6 bg-white rounded-2xl shadow-md max-w-5xl mx-auto">
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-gray-900">{{ $topicId ? 'Edit Topic' : 'Create New Topic' }}</h2>
+        <p class="mt-1 text-sm text-gray-600">Follow the steps to create or edit a topic.</p>
     </div>
 
-    @if (session()->has('success'))
-        <div class="mb-4 p-4 bg-green-100 border border-green-200 text-green-700 rounded-lg">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session()->has('error'))
-        <div class="mb-4 p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <form wire:submit.prevent="save" class="space-y-6">
-        <div class="bg-pink-50 p-6 rounded-lg">
-            <div class="grid gap-6">
-                <div>
-                    <label for="topic_title" class="block text-sm font-medium text-gray-700">Topic Title</label>
-                    <input type="text" wire:model="topic_title" id="topic_title"
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200">
-                    @error('topic_title')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
-                    <textarea wire:model="content" id="content" rows="4"
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200"></textarea>
-                    @error('content')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div class="bg-pink-50 p-4 rounded-lg">
-                    <label for="chapter_filter" class="block text-sm font-medium text-gray-700 mb-2">Select Chapter</label>
-                    <select wire:model="selectedChapter" id="chapter_filter" 
-                        class="w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-200">
-                        <option value="">Select a chapter...</option>
-                        @foreach($chapters as $chapter)
-                            <option value="{{ $chapter->id }}">{{ $chapter->chapter_title }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="order_index" class="block text-sm font-medium text-gray-700">Order</label>
-                    <input type="number" wire:model="order_index" id="order_index"
-                        class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200">
-                    @error('order_index')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="video" class="block text-sm font-medium text-gray-700">Video</label>
-                    <input type="file" wire:model="video" id="video" accept="video/mp4,video/quicktime"
-                        class="mt-1 block w-full text-sm text-gray-500
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-lg file:border-0
-                        file:text-sm file:font-medium
-                        file:bg-pink-50 file:text-pink-700
-                        hover:file:bg-pink-100">
-                    <div wire:loading wire:target="video" class="mt-2 text-sm text-gray-500">
-                        Uploading video...
+    {{-- Stepper Header --}}
+    <div class="flex items-center justify-between mb-8 relative">
+        @foreach ([1 => 'Course & Chapter', 2 => 'Topic Details', 3 => 'Upload Video'] as $index => $label)
+            <div class="flex flex-col items-center flex-1">
+                <div class="relative">
+                    <div
+                        class="w-10 h-10 flex items-center justify-center rounded-full text-white font-semibold
+                        {{ $step >= $index ? 'bg-pink-600' : 'bg-gray-300' }}">
+                        {{ $index }}
                     </div>
-                    @error('video')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                    @if($currentVideo)
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500">Current video:</p>
-                            <a href="{{ $currentVideo }}" target="_blank" 
-                                class="text-pink-600 hover:text-pink-700 text-sm underline">
-                                View current video
-                            </a>
+                    @if($index < 3)
+                        <div class="absolute top-1/2 right-[-50%] transform -translate-y-1/2 w-full h-1
+                            {{ $step > $index ? 'bg-pink-500' : 'bg-gray-200' }}">
                         </div>
                     @endif
                 </div>
+                <span
+                    class="mt-2 text-sm font-medium {{ $step >= $index ? 'text-pink-600' : 'text-gray-500' }}">{{ $label }}</span>
+            </div>
+        @endforeach
+    </div>
+
+    <form wire:submit.prevent="save" class="space-y-8">
+
+        {{-- STEP 1: Select Course and Chapter --}}
+        @if($step === 1)
+        <div class="bg-pink-50 p-6 rounded-xl shadow-inner">
+            <h3 class="text-lg font-semibold text-pink-700 mb-4">Step 1: Select Course and Chapter</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <select wire:model="selectedCourse">
+                    <option value="">Choose a course</option>
+                    @foreach($courses as $c)
+                        <option value="{{ $c->id }}">{{ $c->title ?? $c->course_title }}</option>
+                    @endforeach
+                </select>
+
+                <select wire:model="selectedChapter">
+                    <option value="">Choose a chapter</option>
+                    @foreach($chapters as $chapter)
+                        <option value="{{ $chapter->id }}">{{ $chapter->chapter_title }}</option>
+                    @endforeach
+                </select>
+
             </div>
         </div>
+        @endif
 
-        <div class="flex justify-end space-x-4">
-            <a href="{{ route('admin.topics', ['chapters_id' => $chaptersId]) }}"
-                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
-                Cancel
-            </a>
-            <button type="submit"
-                class="px-4 py-2 border border-transparent rounded-lg text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
-                {{ $topicId ? 'Update Topic' : 'Create Topic' }}
-            </button>
+        {{-- STEP 2: Topic Details --}}
+        @if($step === 2)
+        <div class="bg-pink-50 p-6 rounded-xl shadow-inner">
+            <h3 class="text-lg font-semibold text-pink-700 mb-4">Step 2: Topic Details</h3>
+            <div class="grid gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Topic Title</label>
+                    <input type="text" wire:model="topic_title" class="w-full rounded-lg border-gray-300 mt-1 focus:ring-pink-300 focus:border-pink-500">
+                    @error('topic_title') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Content</label>
+                    <textarea wire:model="content" rows="4" class="w-full rounded-lg border-gray-300 mt-1 focus:ring-pink-300 focus:border-pink-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Order</label>
+                    <input type="number" wire:model="order_index" class="w-full rounded-lg border-gray-300 mt-1 focus:ring-pink-300 focus:border-pink-500">
+                </div>
+            </div>
         </div>
+        @endif
+
+        {{-- STEP 3: Upload Video --}}
+        @if($step === 3)
+        <div class="bg-pink-50 p-6 rounded-xl shadow-inner">
+            <h3 class="text-lg font-semibold text-pink-700 mb-4">Step 3: Upload Video</h3>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-500 transition">
+                <input type="file" wire:model="video" accept="video/mp4,video/quicktime" class="hidden" id="videoUpload">
+                <label for="videoUpload" class="cursor-pointer">
+                    <svg class="mx-auto h-10 w-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-700">Click to upload video or drag here</p>
+                    <p class="text-xs text-gray-500">MP4 or MOV, up to 100MB</p>
+                </label>
+            </div>
+
+            @if($currentVideo)
+                <div class="mt-4">
+                    <p class="text-sm font-medium text-gray-700 mb-1">Current Video:</p>
+                    <a href="{{ $currentVideo }}" target="_blank" class="text-pink-600 hover:underline">View current video</a>
+                </div>
+            @endif
+        </div>
+        @endif
+
+        {{-- Navigation Buttons --}}
+        <div class="flex justify-between items-center mt-8">
+            @if($step > 1)
+                <button type="button" wire:click="prevStep"
+                    class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                    ← Previous
+                </button>
+            @endif
+
+            @if($step < 3)
+                <button type="button" wire:click="nextStep"
+                    class="px-6 py-2 rounded-lg bg-pink-600 text-white hover:bg-pink-700 disabled:opacity-50"
+                    {{ !$selectedCourse && $step === 1 ? 'disabled' : '' }}>
+                    Next →
+                </button>
+            @else
+                <button type="submit"
+                    class="px-6 py-2 rounded-lg bg-pink-600 text-white hover:bg-pink-700">
+                    {{ $topicId ? 'Update Topic' : 'Create Topic' }}
+                </button>
+            @endif
+        </div>
+
     </form>
 </div>
