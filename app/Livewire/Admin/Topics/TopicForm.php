@@ -57,11 +57,9 @@ class TopicForm extends Component
         $this->order_index = $topic->order_index;
         $this->currentVideo = $topic->video_url;
         $this->selectedChapter = $topic->chapters_id;
-        // set selectedCourse if chapter has one
         $chapter = Chapters::find($topic->chapters_id);
         if ($chapter) {
             $this->selectedCourse = $chapter->course_id ?? null;
-            // preload chapters for that course
             $this->availableChapters = Chapters::where('course_id', $this->selectedCourse)
                 ->orderBy('chapter_title')
                 ->get();
@@ -145,7 +143,7 @@ class TopicForm extends Component
     public function render()
     {
         $courses = Course::orderBy('title')->get();
-        $chapters = $this->availableChapters; // only chapters for selected course
+        $chapters = $this->availableChapters; 
 
         return view('livewire.admin.topics.topic-form', [
             'courses' => $courses,

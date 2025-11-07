@@ -67,12 +67,9 @@
                             <div class="text-sm font-medium text-gray-900">{{ $topic->topic_title }}</div>
                             <div class="text-sm text-gray-500">{{ Str::limit($topic->content, 50) }}</div>
                         </td>
+                       
                         <td class="px-6 py-4">
-                            <ul class="text-sm text-gray-900 list-disc list-inside space-y-1">
-                                @foreach ($chapters as $chapter)
-                                    {{ $chapter->chapter_title }}
-                                @endforeach
-                            </ul>
+                            {{ $topic->chapter->chapter_title ?? 'No Chapter Assigned' }}
                         </td>
                         <td class="px-6 py-4">
                             @if ($topic->video_url)
