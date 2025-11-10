@@ -36,6 +36,7 @@ class TopicForm extends Component
         'topic_title' => 'required|min:3',
         'content' => 'nullable',
         'order_index' => 'required|numeric|min:0',
+        'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:102400', // max 100MB
     ];
 
     protected $messages = [
@@ -160,22 +161,48 @@ class TopicForm extends Component
 
     protected function uploadVideo()
     {
-        $chapter = Chapters::find($this->selectedChapter);
-        $chapterFolder = $chapter ? Str::slug($chapter->chapter_title) : 'uncategorized';
-        $fileName = time() . '_' . Str::random(10) . '.' . $this->video->getClientOriginalExtension();
+        try {
+            $chapter = Chapters::find($this->selectedChapter);
+            $chapterFolder = $chapter ? Str::slug($chapter->chapter_title) : 'uncategorized';
+            
+            // Debug video information
+            logger('Video Upload Debug:', [
+                'originalName' => $this->video->getClientOriginalName(),
+                'mimeType' => $this->video->getMimeType(),
+                'size' => $this->video->getSize(),
+                'tempPath' => $this->video->getRealPath(),
+                'chapterFolder' => $chapterFolder
+            ]);
 
-        if ($this->currentVideo) {
-            $this->deleteOldVideo();
+            $fileName = time() . '_' . Str::random(10) . '.' . $this->video->getClientOriginalExtension();
+
+            if ($this->currentVideo) {
+                $this->deleteOldVideo();
+            }
+
+            // Ensure the video file exists and is valid
+            if (!$this->video->isValid()) {
+                throw new \Exception('Invalid video file');
+            }
+
+            $path = Storage::disk('do_spaces')->putFileAs(
+                "videos/{$chapterFolder}",
+                $this->video,
+                $fileName,
+                'public'
+            );
+
+            if (!Storage::disk('do_spaces')->exists($path)) {
+                throw new \Exception('Failed to upload video to DigitalOcean Spaces');
+            }
+
+            $url = Storage::disk('do_spaces')->url($path);
+            logger('Video Upload Success:', ['url' => $url]);
+            return $url;
+        } catch (\Exception $e) {
+            logger('Video Upload Error:', ['error' => $e->getMessage()]);
+            throw $e;
         }
-
-        $path = Storage::disk('do_spaces')->putFileAs(
-            "videos/{$chapterFolder}",
-            $this->video,
-            $fileName,
-            'public'
-        );
-
-        return Storage::disk('do_spaces')->url($path);
     }
 
     protected function deleteOldVideo()

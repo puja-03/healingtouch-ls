@@ -119,16 +119,35 @@
         <div class="bg-pink-50 p-6 rounded-xl shadow-inner">
             <h3 class="text-lg font-semibold text-pink-700 mb-4">Step 3: Upload Video</h3>
             <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-500 transition">
-                <input type="file" wire:model="video" accept="video/mp4,video/quicktime" class="hidden" id="videoUpload">
-                <label for="videoUpload" class="cursor-pointer">
-                    <svg class="mx-auto h-10 w-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    <p class="mt-2 text-sm text-gray-700">Click to upload video or drag here</p>
-                    <p class="text-xs text-gray-500">MP4 or MOV, up to 100MB</p>
-                </label>
+                <div x-data="{ isUploading: false, progress: 0 }"
+                     x-on:livewire-upload-start="isUploading = true"
+                     x-on:livewire-upload-finish="isUploading = false; progress = 0"
+                     x-on:livewire-upload-error="isUploading = false"
+                     x-on:livewire-upload-progress="progress = $event.detail.progress">
+                    
+                    <input type="file" wire:model="video" accept="video/mp4,video/quicktime" class="hidden" id="videoUpload">
+                    <label for="videoUpload" class="cursor-pointer block">
+                        <svg class="mx-auto h-10 w-10 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <p class="mt-2 text-sm text-gray-700">Click to upload video or drag here</p>
+                        <p class="text-xs text-gray-500">MP4 or MOV, up to 100MB</p>
+                    </label>
+
+                    <!-- Progress Bar -->
+                    <div x-show="isUploading" class="mt-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-pink-600 h-2.5 rounded-full transition-all duration-150" x-bind:style="'width: ' + progress + '%'"></div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2" x-text="'Upload Progress: ' + progress + '%'"></p>
+                    </div>
+                </div>
             </div>
+
+            @error('video') 
+                <p class="text-red-600 text-sm mt-2">{{ $message }}</p> 
+            @enderror
 
             @if($video)
                 <div class="mt-4">
