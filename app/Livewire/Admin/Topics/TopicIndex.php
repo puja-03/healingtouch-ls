@@ -64,7 +64,7 @@ class TopicIndex extends Component
         }
 
         return view('livewire.admin.topics.index', [
-            'topics' => $query->orderBy('order_index')->paginate(10),
+            'topics' => $query->orderBy('order_index')->paginate(8),
             'chapters' => Chapters::orderBy('chapter_title')->get()
         ]);
     }
