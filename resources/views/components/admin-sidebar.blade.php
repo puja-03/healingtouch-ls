@@ -9,6 +9,8 @@
 
         <a href="{{ route('admin.topics') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Topics</a>
 
+        <a href="{{ route('admin.instructors') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Instructors</a>
+
         <form method="POST" action="{{ route('logout') }}" wire:navigate class="mt-4">
             @csrf
             <button type="submit" class="w-full text-left px-3 py-2 rounded hover:bg-gray-100">Logout</button>

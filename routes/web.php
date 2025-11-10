@@ -17,6 +17,8 @@ use App\Livewire\Admin\Chapters\ChapterIndex;
 use App\Livewire\Admin\Chapters\ChapterForm;
 use App\Livewire\Admin\Topics\TopicIndex ;
 use App\Livewire\Admin\Topics\TopicForm;
+use App\Livewire\Admin\Instructor\InstructorIndex ;
+use App\Livewire\Admin\Instructor\InstructorForm ;
 //Instructor
 use App\Livewire\Instructor\Dashboard As InstructorDashboard;
 
@@ -53,6 +55,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/topics', TopicIndex::class)->name('admin.topics');
         Route::get('/topics/create', TopicForm::class)->name('admin.topics.create');
         Route::get('/topics/{topic_id}/edit', TopicForm::class)->name('admin.topics.edit');
+         
+        // Instructor Routes
+        Route::get('/instructors', InstructorIndex::class)->name('admin.instructors');
+        Route::get('/instructors/create', InstructorForm::class)->name('admin.instructors.create');
+        Route::get('/instructors/{instructor_id}/edit', InstructorForm::class)->name('admin.instructors.edit');
     });
 
     // Instructor Routes
