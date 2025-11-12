@@ -1,6 +1,6 @@
 <aside class="w-64 bg-white border-r hidden md:block">
     <div class="p-4 border-b">
-        <h3 class="text-lg font-semibold">Admin</h3>
+        <h3 class="text-lg font-semibold">Admin Panel</h3>
     </div>
     <nav class="p-4 space-y-1">
         <a href="{{ route('admin.dashboard') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Dashboard</a>

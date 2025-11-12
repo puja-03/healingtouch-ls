@@ -1,4 +1,4 @@
-<div class="p-6 bg-white rounded-2xl shadow-md max-w-7xl mx-auto">
+<div class="p-6 bg-white rounded-2xl shadow-md">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold">My Courses</h2>
         <div class="flex items-center gap-2">
