@@ -39,7 +39,6 @@ class InstructorForm extends Component
                 Rule::unique('users', 'email')->ignore($this->editingId),
             ],
             'form.role' => ['required', 'string', Rule::in(['instructor', 'admin', 'user'])],
-            // password rule added dynamically in save()
         ];
     }
 
@@ -80,7 +79,6 @@ class InstructorForm extends Component
 
     public function save()
     {
-        // merge dynamic password rule
         $rules = $this->rules();
 
         if ($this->editingId) {
@@ -118,10 +116,8 @@ class InstructorForm extends Component
                 session()->flash('success', 'Instructor created successfully.');
             }
 
-            // emit event for parent/list to refresh
             $this->emitUp('instructorSaved');
 
-            // reset local state
             $this->editingId = null;
             $this->resetForm();
         } catch (\Exception $e) {

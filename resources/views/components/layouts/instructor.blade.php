@@ -1,39 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instructor Dashboard - {{ config('app.name') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>    
     @livewireStyles
 </head>
-<body class="min-h-screen bg-gray-50">
-    <nav class="bg-white shadow mb-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="shrink-0 flex items-center"> 
-                        <a href="/">{{ config('app.name') }}</a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    @auth
-                        <span class="mr-4">{{ auth()->user()->name }}</span>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="text-sm text-red-600">Logout</button>
-                        </form>
-                    @endauth
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex">
+        @auth
+            @include('components.instructor-sidebar')
+        @endauth
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {{ $slot }}
-    </main>
+        <!-- Main Content -->
+        <div class="flex-1">
+            <main class="py-6 sm:px-6 lg:px-8">
+                {{ $slot }}
+            </main>
+        </div>
+    </div>
 
     @livewireScripts
-    @stack('scripts')
+    <script>
+        // Mobile menu toggle
+        document.querySelector('button').addEventListener('click', () => {
+            document.querySelector('.bg-gray-800').classList.toggle('-translate-x-full');
+        });
+    </script>
 </body>
 </html>
