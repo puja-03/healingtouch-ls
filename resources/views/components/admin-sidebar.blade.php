@@ -11,9 +11,13 @@
 
         <a href="{{ route('admin.instructors') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Instructors</a>
 
-        <form method="POST" action="{{ route('logout') }}" wire:navigate class="mt-4">
-            @csrf
-            <button type="submit" class="w-full text-left px-3 py-2 rounded hover:bg-gray-100">Logout</button>
-        </form>
+        <div class="ml-3">
+                 <p class="text-base font-medium text-gray-700">{{ auth()->user()->name }}</p>
+                 <form method="POST" action="{{ route('logout') }}"
+                     class="text-sm font-medium text-gray-500 hover:text-gray-700">
+                     @csrf
+                     <button type="submit" class="text-red-600">Logout</button>
+                 </form>
+             </div>
     </nav>
 </aside>
