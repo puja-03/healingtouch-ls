@@ -72,7 +72,8 @@ class ChapterForm extends Component
                 ]);
             }
 
-            $this->emitUp('chapterSaved');
+            $this->dispatch('chapter-saved');
+
             $this->resetForm();
             $this->editingId = null;
         } catch (\Exception $e) {
@@ -85,7 +86,7 @@ class ChapterForm extends Component
     {
         $this->resetForm();
         $this->editingId = null;
-        $this->emitUp('chapterCancelled');
+        $this->dispatch('chapter-cancelled');
     }
 
     public function render()

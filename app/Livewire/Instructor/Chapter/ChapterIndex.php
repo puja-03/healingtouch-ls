@@ -26,6 +26,7 @@ class ChapterIndex extends Component
         // Verify course belongs to logged-in instructor
         $this->courseId = Course::where('user_id', auth()->id())
             ->findOrFail($courseId)->id;
+
     }
 
     public function updatedSearch()
@@ -82,13 +83,13 @@ class ChapterIndex extends Component
         $this->deletingId = null;
         $this->resetPage();
     }
-
+    #[On('chapter-saved')]
     public function onChapterSaved()
     {
         $this->showForm = false;
         $this->resetPage();
     }
-
+    #[On('chapter-cancelled')]
     public function onChapterCancelled()
     {
         $this->showForm = false;

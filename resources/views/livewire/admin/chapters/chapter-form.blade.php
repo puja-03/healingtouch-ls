@@ -21,6 +21,16 @@
     @endif
 
     <form wire:submit.prevent="save" class="space-y-6">
+        <div class="bg-pink-50 p-4 rounded-lg">
+            <label for="course_filter" class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
+            <select wire:model="selectedCourse" id="course_filter" 
+                class="w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-200">
+                <option value="">Select a course...</option>
+                @foreach($courses as $course)
+                    <option value="{{ $course->id }}">{{ $course->title }}</option>
+                @endforeach
+            </select>
+        </div>
         <div class="bg-pink-50 p-6 rounded-lg">
             <div class="grid gap-6">
                 <div>
@@ -42,16 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-pink-50 p-4 rounded-lg">
-            <label for="course_filter" class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
-            <select wire:model="selectedCourse" id="course_filter" 
-                class="w-full rounded-lg border-gray-300 focus:border-pink-500 focus:ring focus:ring-pink-200">
-                <option value="">Select a course...</option>
-                @foreach($courses as $course)
-                    <option value="{{ $course->id }}">{{ $course->title }}</option>
-                @endforeach
-            </select>
-        </div>
+        
         <div class="flex justify-end space-x-4">
             <a href="{{ route('admin.chapters', ['course_id' => $courseId]) }}"
                 class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
