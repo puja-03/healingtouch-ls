@@ -101,10 +101,7 @@ class ChapterForm extends Component
                 Log::info('Chapter created:', ['id' => $chapter->id]);
             }
 
-            // Reset form
             $this->resetForm();
-            
-            // Dispatch success event
             $this->dispatch('chapter-saved', message: $message);
             
             return true;

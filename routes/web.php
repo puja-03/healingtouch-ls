@@ -84,7 +84,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/chapters/{chapter_id}/edit', InstructorChapterForm::class)->name('instructor.chapters.edit');
         
         // Instructor Topic Routes
-        Route::get('/topics', InstructorTopicIndex::class)->name('instructor.topic');
+
+        Route::get('/topics/{chapterId}', InstructorTopicIndex::class)->name('instructor.topic');
         Route::get('/topics/create', InstructorTopicForm::class)->name('instructor.topics.create');
         Route::get('/topics/{topic_id}/edit', InstructorTopicForm::class)->name('instructor.topics.edit');
 

@@ -7,7 +7,12 @@ use App\Models\Chapters;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\On;
 
+#[Title('Topic Index')]
+#[Layout('components.layouts.instructor')]
 class TopicIndex extends Component
 {
     use WithPagination;
@@ -47,16 +52,14 @@ class TopicIndex extends Component
 
     public function edit($id)
     {
-        $topic = Topics::where('chapters_id', $this->chapterId)
-            ->findOrFail($id);
-        
-        $this->editingId = $topic->id;
+        $this->editingId = $id;
         $this->showForm = true;
     }
 
     public function cancel()
     {
         $this->showForm = false;
+        $this->editingId = null;
     }
 
     public function confirmDelete($id)
@@ -83,15 +86,17 @@ class TopicIndex extends Component
             }
 
             $topic->delete();
+            
             session()->flash('success', 'Topic deleted successfully.');
+            $this->resetPage();
+            
         } catch (\Exception $e) {
-            Log::error('Instructor topic delete error: ' . $e->getMessage());
-            session()->flash('error', 'Unable to delete topic.');
+            Log::error('Topic delete error: ' . $e->getMessage());
+            session()->flash('error', 'Unable to delete topic: ' . $e->getMessage());
         }
 
         $this->confirmingDelete = false;
         $this->deletingId = null;
-        $this->resetPage();
     }
 
     protected function deleteOldVideo($videoUrl)
@@ -106,15 +111,34 @@ class TopicIndex extends Component
         }
     }
 
-    public function onTopicSaved()
+    #[On('topic-saved')]
+    public function onTopicSaved($message = null)
     {
         $this->showForm = false;
+        $this->editingId = null;
+        
+        if ($message) {
+            session()->flash('success', $message);
+        } else {
+            session()->flash('success', 'Topic saved successfully.');
+        }
+        
         $this->resetPage();
     }
 
+    #[On('topic-cancelled')]
     public function onTopicCancelled()
     {
         $this->showForm = false;
+        $this->editingId = null;
+    }
+
+    #[On('error')]
+    public function onError($message)
+    {
+        session()->flash('error', $message);
+        $this->showForm = false;
+        $this->editingId = null;
     }
 
     public function render()
