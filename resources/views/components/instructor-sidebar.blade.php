@@ -8,6 +8,7 @@
         {{-- <a href="{{ route('instructor.chapter') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Chapters</a> --}}
          
         {{-- <a href="{{ route('instructor.topics') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Topics</a> --}}
+        <a href="{{ route('instructor.profile') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-400">Profile</a>
 
         <div class="ml-3">
                  <p class="text-base font-medium text-gray-700">{{ auth()->user()->name }}</p>
