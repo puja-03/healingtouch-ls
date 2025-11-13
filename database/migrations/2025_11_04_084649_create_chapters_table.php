@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('chapters', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')->constrained()->onDelete('cascade'); 
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('chapter_title');
             $table->text('chapter_slug')->unique();
             $table->integer('order_index')->default(0);
             $table->timestamps();
+            $table->index(['course_id', 'order_index']);
+
         });
     }
 

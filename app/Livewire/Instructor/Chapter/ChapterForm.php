@@ -12,80 +12,120 @@ class ChapterForm extends Component
     public $courseId;
     public $editingId = null;
 
-    public $form = [
-        'chapter_title' => '',
-        'order_index' => 0,
-    ];
+    public $chapter_title = '';
+    public $order_index = 1;
 
     protected function rules()
     {
         return [
-            'form.chapter_title' => ['required', 'string', 'max:255'],
-            'form.order_index' => ['required', 'numeric', 'min:0'],
+            'chapter_title' => 'required|string|min:3|max:255',
+            'order_index' => 'required|integer|min:1',
         ];
     }
+
+    protected $messages = [
+        'chapter_title.required' => 'Chapter title is required.',
+        'chapter_title.min' => 'Chapter title must be at least 3 characters.',
+        'order_index.required' => 'Order index is required.',
+        'order_index.min' => 'Order index must be at least 1.',
+    ];
 
     public function mount($courseId, $editingId = null)
     {
         $this->courseId = $courseId;
+        $this->editingId = $editingId;
         
         if ($editingId) {
-            $this->load($editingId);
+            $this->loadChapter($editingId);
+        } else {
+            $this->setNextOrderIndex();
         }
     }
 
-    public function load($id)
+    public function loadChapter($id)
     {
-        $chapter = Chapters::where('course_id', $this->courseId)
-            ->findOrFail($id);
-        
-        $this->editingId = $chapter->id;
-        $this->form = [
-            'chapter_title' => $chapter->chapter_title,
-            'order_index' => $chapter->order_index,
-        ];
+        try {
+            $chapter = Chapters::where('course_id', $this->courseId)
+                ->findOrFail($id);
+            
+            $this->chapter_title = $chapter->chapter_title;
+            $this->order_index = $chapter->order_index;
+            
+        } catch (\Exception $e) {
+            Log::error('Error loading chapter: ' . $e->getMessage());
+            $this->dispatch('error', message: 'Chapter not found.');
+            $this->cancel();
+        }
     }
 
-    public function resetForm()
+    public function setNextOrderIndex()
     {
-        $this->form = [
-            'chapter_title' => '',
-            'order_index' => 0,
-        ];
+        $lastChapter = Chapters::where('course_id', $this->courseId)
+            ->orderBy('order_index', 'desc')
+            ->first();
+        
+        $this->order_index = $lastChapter ? $lastChapter->order_index + 1 : 1;
     }
 
     public function save()
     {
-        $validated = $this->validate();
+        $this->validate();
 
         try {
+            $chapterData = [
+                'chapter_title' => $this->chapter_title,
+                'order_index' => $this->order_index,
+                'course_id' => $this->courseId,
+                'user_id' => auth()->id(),
+            ];
+
+            Log::info('Attempting to save chapter:', $chapterData);
+
             if ($this->editingId) {
+                // Update existing chapter
                 $chapter = Chapters::where('course_id', $this->courseId)
-                    ->findOrFail($this->editingId);
+                    ->where('id', $this->editingId)
+                    ->first();
                 
-                $chapter->update($this->form);
+                if (!$chapter) {
+                    throw new \Exception('Chapter not found for editing.');
+                }
+                
+                $chapter->update($chapterData);
+                $message = 'Chapter updated successfully.';
+                Log::info('Chapter updated:', ['id' => $chapter->id]);
             } else {
-                Chapters::create([
-                    'course_id' => $this->courseId,
-                    'user_id' => auth()->id(),
-                    ...$this->form,
-                ]);
+                // Create new chapter
+                $chapter = Chapters::create($chapterData);
+                $message = 'Chapter created successfully.';
+                Log::info('Chapter created:', ['id' => $chapter->id]);
             }
 
-            $this->dispatch('chapter-saved');
-
+            // Reset form
             $this->resetForm();
-            $this->editingId = null;
+            
+            // Dispatch success event
+            $this->dispatch('chapter-saved', message: $message);
+            
+            return true;
+            
         } catch (\Exception $e) {
-            Log::error('Instructor chapter save error: ' . $e->getMessage());
-            session()->flash('error', 'An error occurred while saving the chapter.');
+            Log::error('Chapter save error: ' . $e->getMessage());
+            $this->dispatch('error', message: 'Failed to save chapter: ' . $e->getMessage());
+            return false;
         }
+    }
+
+    private function resetForm()
+    {
+        $this->chapter_title = '';
+        $this->order_index = 1;
+        $this->editingId = null;
     }
 
     public function cancel()
     {
         $this->resetForm();
-        $this->editingId = null;
         $this->dispatch('chapter-cancelled');
     }
 

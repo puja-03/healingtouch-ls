@@ -79,7 +79,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/courses/{courseId}/edit', InstructorCourseForm::class)->name('instructor.courses.edit');
         
         // Instructor Chapter Routes
-        Route::get('/chapters', InstructorChapterIndex::class)->name('instructor.chapter');
+        Route::get('/chapters/{courseId}', InstructorChapterIndex::class)->name('instructor.chapter');
         Route::get('/chapters/create', InstructorChapterForm::class)->name('instructor.chapters.create');
         Route::get('/chapters/{chapter_id}/edit', InstructorChapterForm::class)->name('instructor.chapters.edit');
         

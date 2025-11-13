@@ -5,7 +5,6 @@
     <nav class="p-4 space-y-1">
         <a href="{{ route('instructor.dashboard') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-400">Dashboard</a>
         <a href="{{ route('instructor.courses') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-400">Courses</a>
-        {{-- <a href="{{ route('instructor.chapter') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Chapters</a> --}}
          
         {{-- <a href="{{ route('instructor.topics') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-100">Topics</a> --}}
         <a href="{{ route('instructor.profile') }}" wire:navigate class="block px-3 py-2 rounded hover:bg-gray-400">Profile</a>

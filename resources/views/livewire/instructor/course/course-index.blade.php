@@ -67,7 +67,10 @@
                                     <button wire:click="confirmDelete({{ $course->id }})" class="button text-red-600 hover:text-red-900 bg-red-100 px-2 py-1 rounded-md">
                                         Delete
                                     </button>
-                                </div>
+                                    <a href="{{ route('instructor.chapter', ['courseId' => $course->id]) }}" wire:navigate class="button text-white bg-gray-500 px-2 py-1 rounded-md">
+                                                Chapters
+                                            </a>
+                                                                                                </div>
                             </td>
                         </tr>
                     @endforeach

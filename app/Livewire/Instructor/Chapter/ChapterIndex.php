@@ -7,7 +7,12 @@ use App\Models\Course;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\On;
 
+#[Title('Chapter Index')]
+#[Layout('components.layouts.instructor')]
 class ChapterIndex extends Component
 {
     use WithPagination;
@@ -26,7 +31,6 @@ class ChapterIndex extends Component
         // Verify course belongs to logged-in instructor
         $this->courseId = Course::where('user_id', auth()->id())
             ->findOrFail($courseId)->id;
-
     }
 
     public function updatedSearch()
@@ -52,6 +56,7 @@ class ChapterIndex extends Component
     public function cancel()
     {
         $this->showForm = false;
+        $this->editingId = null;
     }
 
     public function confirmDelete($id)
@@ -83,17 +88,36 @@ class ChapterIndex extends Component
         $this->deletingId = null;
         $this->resetPage();
     }
-    #[On('chapter-saved')]
-    public function onChapterSaved()
+
+   #[On('chapter-saved')]
+    public function onChapterSaved($message = null)
     {
         $this->showForm = false;
+        $this->editingId = null;
+        
+        if ($message) {
+            session()->flash('success', $message);
+        } else {
+            session()->flash('success', 'Chapter saved successfully.');
+        }
+        
         $this->resetPage();
     }
+
     #[On('chapter-cancelled')]
     public function onChapterCancelled()
     {
         $this->showForm = false;
+        $this->editingId = null;
     }
+
+    #[On('error')]
+    public function onError($message)
+    {
+        session()->flash('error', $message);
+        $this->showForm = false;
+        $this->editingId = null;
+    }   
 
     public function render()
     {
