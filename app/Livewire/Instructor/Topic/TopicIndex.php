@@ -17,7 +17,7 @@ class TopicIndex extends Component
 {
     use WithPagination;
 
-    public $chapterId;
+    public $chapter; // Chapter object directly
     public $search = '';
     public $showForm = false;
     public $editingId = null;
@@ -26,17 +26,15 @@ class TopicIndex extends Component
 
     protected $paginationTheme = 'tailwind';
 
-    public function mount($chapterId)
+    public function mount(Chapters $chapter)
     {
+        // Chapter automatically resolved by chapter_slug
+        $this->chapter = $chapter;
+
         // Verify chapter belongs to logged-in instructor's course
-        $chapter = Chapters::with('course')
-            ->findOrFail($chapterId);
-        
         if ($chapter->course->user_id !== auth()->id()) {
             abort(403);
         }
-
-        $this->chapterId = $chapterId;
     }
 
     public function updatedSearch()
@@ -52,7 +50,10 @@ class TopicIndex extends Component
 
     public function edit($id)
     {
-        $this->editingId = $id;
+        $topic = Topics::where('chapters_id', $this->chapter->id)
+            ->findOrFail($id);
+        
+        $this->editingId = $topic->id;
         $this->showForm = true;
     }
 
@@ -77,7 +78,7 @@ class TopicIndex extends Component
     public function delete($id)
     {
         try {
-            $topic = Topics::where('chapters_id', $this->chapterId)
+            $topic = Topics::where('chapters_id', $this->chapter->id)
                 ->findOrFail($id);
             
             // Delete video from storage if exists
@@ -86,17 +87,15 @@ class TopicIndex extends Component
             }
 
             $topic->delete();
-            
             session()->flash('success', 'Topic deleted successfully.');
-            $this->resetPage();
-            
         } catch (\Exception $e) {
-            Log::error('Topic delete error: ' . $e->getMessage());
-            session()->flash('error', 'Unable to delete topic: ' . $e->getMessage());
+            Log::error('Instructor topic delete error: ' . $e->getMessage());
+            session()->flash('error', 'Unable to delete topic.');
         }
 
         $this->confirmingDelete = false;
         $this->deletingId = null;
+        $this->resetPage();
     }
 
     protected function deleteOldVideo($videoUrl)
@@ -112,18 +111,12 @@ class TopicIndex extends Component
     }
 
     #[On('topic-saved')]
-    public function onTopicSaved($message = null)
+    public function onTopicSaved()
     {
         $this->showForm = false;
         $this->editingId = null;
-        
-        if ($message) {
-            session()->flash('success', $message);
-        } else {
-            session()->flash('success', 'Topic saved successfully.');
-        }
-        
         $this->resetPage();
+        session()->flash('success', 'Topic saved successfully.');
     }
 
     #[On('topic-cancelled')]
@@ -133,19 +126,9 @@ class TopicIndex extends Component
         $this->editingId = null;
     }
 
-    #[On('error')]
-    public function onError($message)
-    {
-        session()->flash('error', $message);
-        $this->showForm = false;
-        $this->editingId = null;
-    }
-
     public function render()
     {
-        $chapter = Chapters::findOrFail($this->chapterId);
-
-        $query = Topics::where('chapters_id', $this->chapterId);
+        $query = Topics::where('chapters_id', $this->chapter->id);
 
         if (!empty($this->search)) {
             $query->where('topic_title', 'like', '%' . $this->search . '%');
@@ -155,7 +138,7 @@ class TopicIndex extends Component
 
         return view('livewire.instructor.topic.topic-index', [
             'topics' => $topics,
-            'chapter' => $chapter,
+            'chapter' => $this->chapter,
         ]);
     }
 }

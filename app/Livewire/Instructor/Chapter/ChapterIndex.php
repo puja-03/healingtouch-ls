@@ -17,7 +17,7 @@ class ChapterIndex extends Component
 {
     use WithPagination;
 
-    public $courseId;
+    public $course; // Course object directly
     public $search = '';
     public $showForm = false;
     public $editingId = null;
@@ -26,11 +26,15 @@ class ChapterIndex extends Component
 
     protected $paginationTheme = 'tailwind';
 
-    public function mount($courseId)
+    public function mount(Course $course)
     {
+        // Course automatically resolved by slug
+        $this->course = $course;
+        
         // Verify course belongs to logged-in instructor
-        $this->courseId = Course::where('user_id', auth()->id())
-            ->findOrFail($courseId)->id;
+        if ($course->user_id !== auth()->id()) {
+            abort(403);
+        }
     }
 
     public function updatedSearch()
@@ -46,7 +50,7 @@ class ChapterIndex extends Component
 
     public function edit($id)
     {
-        $chapter = Chapters::where('course_id', $this->courseId)
+        $chapter = Chapters::where('course_id', $this->course->id)
             ->findOrFail($id);
         
         $this->editingId = $chapter->id;
@@ -74,7 +78,7 @@ class ChapterIndex extends Component
     public function delete($id)
     {
         try {
-            $chapter = Chapters::where('course_id', $this->courseId)
+            $chapter = Chapters::where('course_id', $this->course->id)
                 ->findOrFail($id);
             
             $chapter->delete();
@@ -89,19 +93,13 @@ class ChapterIndex extends Component
         $this->resetPage();
     }
 
-   #[On('chapter-saved')]
-    public function onChapterSaved($message = null)
+    #[On('chapter-saved')]
+    public function onChapterSaved()
     {
         $this->showForm = false;
         $this->editingId = null;
-        
-        if ($message) {
-            session()->flash('success', $message);
-        } else {
-            session()->flash('success', 'Chapter saved successfully.');
-        }
-        
         $this->resetPage();
+        session()->flash('success', 'Chapter saved successfully.');
     }
 
     #[On('chapter-cancelled')]
@@ -111,19 +109,9 @@ class ChapterIndex extends Component
         $this->editingId = null;
     }
 
-    #[On('error')]
-    public function onError($message)
-    {
-        session()->flash('error', $message);
-        $this->showForm = false;
-        $this->editingId = null;
-    }   
-
     public function render()
     {
-        $course = Course::findOrFail($this->courseId);
-
-        $query = Chapters::where('course_id', $this->courseId);
+        $query = Chapters::where('course_id', $this->course->id);
 
         if (!empty($this->search)) {
             $query->where('chapter_title', 'like', '%' . $this->search . '%');
@@ -133,7 +121,7 @@ class ChapterIndex extends Component
 
         return view('livewire.instructor.chapter.chapter-index', [
             'chapters' => $chapters,
-            'course' => $course,
+            'course' => $this->course,
         ]);
     }
 }

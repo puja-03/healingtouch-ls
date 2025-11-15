@@ -1,9 +1,9 @@
 <div class="p-6 bg-white rounded-2xl shadow-md">
     <div class="flex items-center justify-between mb-6">
         <div>
-            <a href="{{ route('instructor.chapter', $chapter->course_id) }}" class="text-pink-600 hover:underline text-sm mb-2 block">← Back to Chapters</a>
+            <a href="{{ route('instructor.chapter', $chapter->course->slug) }}" class="text-pink-600 hover:underline text-sm mb-2 block">← Back to Chapters</a>
             <h2 class="text-2xl font-bold">Topics for: {{ $chapter->chapter_title }}</h2>
-            <p class="text-gray-600 mt-1">Chapter: {{ $chapter->chapter_title }}</p>
+            <p class="text-gray-600 mt-1">Chapter: {{ $chapter->chapter_title }} | Course: {{ $chapter->course->title }}</p>
         </div>
         <div class="flex items-center gap-2">
             <input type="text" wire:model.debounce.300ms="search" placeholder="Search topics..."
@@ -84,7 +84,7 @@
     @if($showForm)
         <div wire:key="topic-form-modal">
             <livewire:instructor.topic.topic-form 
-                :chapter-id="$chapterId"
+                :chapter-id="$chapter->id"
                 :editing-id="$editingId" />
         </div>
     @endif

@@ -32,6 +32,10 @@ class Chapters extends Model
             $chapter->chapter_slug = Str::slug($chapter->chapter_title);
         });
     }
+    public function getRouteKeyName()
+    {
+        return 'chapter_slug';
+    }
 
     public function course()
     {

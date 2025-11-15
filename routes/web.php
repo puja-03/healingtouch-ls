@@ -72,25 +72,21 @@ Route::middleware('auth')->group(function () {
     // Instructor Routes
     Route::middleware(InstructorMiddleware::class)->prefix('instructor')->group(function () {
         Route::get('/', InstructorDashboard::class)->name('instructor.dashboard');
-        
-        // Instructor Course Routes
         Route::get('/courses', InstructorCourseIndex::class)->name('instructor.courses');
         Route::get('/courses/create', InstructorCourseForm::class)->name('instructor.courses.create');
-        Route::get('/courses/{courseId}/edit', InstructorCourseForm::class)->name('instructor.courses.edit');
+        Route::get('/courses/{course:slug}/edit', InstructorCourseForm::class)->name('instructor.courses.edit');
         
-        // Instructor Chapter Routes
-        Route::get('/chapters/{courseId}', InstructorChapterIndex::class)->name('instructor.chapter');
-        Route::get('/chapters/create', InstructorChapterForm::class)->name('instructor.chapters.create');
-        Route::get('/chapters/{chapter_id}/edit', InstructorChapterForm::class)->name('instructor.chapters.edit');
+        // Chapter Routes (slug based)
+        Route::get('/chapters/{course:slug}', InstructorChapterIndex::class)->name('instructor.chapter');
+        Route::get('/chapters/{course:slug}/create', InstructorChapterForm::class)->name('instructor.chapters.create');
+        Route::get('/chapters/{chapter:chapter_slug}/edit', InstructorChapterForm::class)->name('instructor.chapters.edit');
         
-        // Instructor Topic Routes
-
-        Route::get('/topics/{chapterId}', InstructorTopicIndex::class)->name('instructor.topic');
-        Route::get('/topics/create', InstructorTopicForm::class)->name('instructor.topics.create');
-        Route::get('/topics/{topic_id}/edit', InstructorTopicForm::class)->name('instructor.topics.edit');
+        // Topic Routes (slug based)
+        Route::get('/topics/{chapter:chapter_slug}',InstructorTopicIndex::class)->name('instructor.topic');
+        Route::get('/topics/{chapter:chapter_slug}/create', InstructorTopicForm::class)->name('instructor.topics.create');
+        Route::get('/topics/{topic:topic_slug}/edit',InstructorTopicForm::class)->name('instructor.topics.edit');
 
         Route::get('/profile', ProfileForm::class)->name('instructor.profile');
-
     });
 
 

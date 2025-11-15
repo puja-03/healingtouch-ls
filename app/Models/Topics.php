@@ -33,6 +33,10 @@ class Topics extends Model
             $topic->topic_slug = Str::slug($topic->topic_title);
         });
     }
+    public function getRouteKeyName()
+    {
+        return 'topic_slug';
+    }
     public function course()
     {
         return $this->belongsTo(Course::class, 'course_id');

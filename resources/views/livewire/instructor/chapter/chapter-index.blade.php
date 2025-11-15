@@ -44,12 +44,14 @@
                             {{ $chapter->created_at->format('M d, Y') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button wire:click="edit({{ $chapter->id }})" 
-                                    class="text-indigo-600 hover:text-indigo-900 mr-4 bg-indigo-50 px-3 py-1 rounded">Edit</button>
-                            <button wire:click="confirmDelete({{ $chapter->id }})" 
-                                    class="text-red-600 hover:text-red-900 mr-4 bg-red-50 px-3 py-1 rounded">Delete</button>
-                            <a href="{{ route('instructor.topic', ['chapterId' => $chapter->id]) }}" 
-                               class="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded">Topics</a>
+                            <div class="flex space-x-2 justify-end">
+                                <button wire:click="edit({{ $chapter->id }})" 
+                                        class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded">Edit</button>
+                                <button wire:click="confirmDelete({{ $chapter->id }})" 
+                                        class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded">Delete</button>
+                                <a href="{{ route('instructor.topic', $chapter->chapter_slug) }}" 
+                                   class="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded">Topics</a>
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -76,7 +78,7 @@
     @if($showForm)
         <div wire:key="chapter-form-modal">
             <livewire:instructor.chapter.chapter-form 
-                :course-id="$courseId"
+                :course-id="$course->id"
                 :editing-id="$editingId" />
         </div>
     @endif
