@@ -10,8 +10,8 @@ use Livewire\Attributes\Title;
 use App\Models\Topic;
 use App\Models\Chapters;
 
-#[Layout('components.layouts.user')]
-#[Title('Browse Courses')]
+#[Layout('components.layouts.app')]
+#[Title('homepage')]
 class Homepage extends Component
 {
     use WithPagination;

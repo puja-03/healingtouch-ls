@@ -9,7 +9,7 @@ use Livewire\Attributes\Title;
 use App\Models\Topic;
 use App\Models\Chapters;
 
-#[Layout('components.layouts.user')]
+#[Layout('components.layouts.public')]
 #[Title('Course Details')]
 class CourseDetail extends Component
 {

@@ -40,33 +40,39 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <!-- User Menu -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
-                            <div class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium">
-                                {{ substr(auth()->user()->name, 0, 1) }}
+                    @if (auth()->check() && auth()->user()->name)
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                                <div
+                                    class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                                <span class="text-gray-700 hidden md:block">{{ auth()->user()->name }}</span>
+                                <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="open" @click.away="open = false"
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+
+                                {{-- <a href="{{ route('settings') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a> --}}
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+                                </form>
                             </div>
-                            <span class="text-gray-700 hidden md:block">{{ auth()->user()->name }}</span>
-                            <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
-                        </button>
-                        
-                        <!-- Dropdown Menu -->
-                        <div x-show="open" @click.away="open = false" 
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-user-circle mr-2 text-gray-500"></i>Profile
-                            </a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                <i class="fas fa-cog mr-2 text-gray-500"></i>Settings
-                            </a>
-                            <div class="border-t my-1"></div>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                                </button>
-                            </form>
                         </div>
-                    </div>
+                    @else
+                        <div class="flex items-center space-x-3">
+                            <a href="{{ route('login') }}"
+                                class="text-gray-600 hover:text-primary-500 transition duration-150">Sign In</a>
+                            <a href="{{ route('register') }}"
+                                class="bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600 transition duration-150">Sign
+                                Up</a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -90,17 +96,11 @@
                         class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200">
                         <i class="fas fa-book mr-3 text-gray-500"></i>Purchased Courses
                     </a>
-                    <a href="{{ route('homepage')}}" wire:navigate
-                        class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200">
-                        <i class="fas fa-search mr-3 text-gray-500"></i>Homepage
-                    </a>
-                    <a href="{{route('user.checkout')}}" wire:navigate
-                        class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200">
-                        <i class="fas fa-shopping-cart mr-3 text-gray-500"></i>Checkout
-                    </a>
-                    
+
                     <!-- Mobile User Info -->
+                    
                     <div class="pt-4 mt-4 border-t md:hidden">
+                        @auth
                         <div class="flex items-center space-x-3">
                             <div class="h-10 w-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium">
                                 {{ substr(auth()->user()->name, 0, 1) }}
@@ -113,7 +113,14 @@
                                 </form>
                             </div>
                         </div>
+                        @else
+                        <div class="flex flex-col space-y-2">
+                            <a href="{{ route('login') }}" class="text-gray-700 hover:text-primary-600 text-center py-2">Login</a>
+                            <a href="{{ route('register') }}" class="bg-primary-500 text-white text-center py-2 rounded-md hover:bg-primary-600 transition duration-150">Register</a>
+                        </div>
+                        @endauth
                     </div>
+
                 </nav>
             </aside>
 

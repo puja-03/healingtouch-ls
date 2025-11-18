@@ -32,24 +32,17 @@ class Login extends Component
             
             $user = Auth::user();
             
-            // Strict role checking - no fallback to prevent incorrect access
+            // Determine default redirect based on role
             if ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard');
+                $default = route('admin.dashboard');
+            } elseif ($user->isInstructor()) {
+                $default = route('instructor.dashboard');
+            } else {
+                $default = route('user.dashboard');
             }
-            
-            if ($user->isInstructor()) {
-                return redirect()->route('instructor.dashboard');
-            }
-            
-            if ($user->isUser()) {
-                return redirect()->route('user.dashboard');
-            }
-            
-            // If no valid role, log them out
-            Auth::logout();
-            session()->invalidate();
-            session()->regenerateToken();
-            return redirect()->route('login')->with('error', 'Invalid user role. Please contact administrator.');
+
+            // Redirect to intended URL if present (preserves flow when login is required before checkout)
+            return redirect()->intended($default);
         }
 
         $this->addError('email', 'The provided credentials do not match our records.');

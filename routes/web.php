@@ -1,8 +1,8 @@
 <?php
+use App\Livewire\Public\Homepage;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\User\Dashboard As UserDashboard;
-use App\Livewire\Public\Homepage;
 use App\Livewire\Public\CourseDetail;
 use App\Livewire\User\PurchasedCourses;
 use App\Livewire\Public\CourseCheckout;
@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\InstructorMiddleware;
-///laravel se video uploade 
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use App\Http\Controllers\VideoUploadsController;
 //ADMIN  
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\CourseList; 
@@ -35,10 +32,8 @@ use App\Livewire\Instructor\Topic\TopicIndex as InstructorTopicIndex;
 use App\Livewire\Instructor\Topic\TopicForm as InstructorTopicForm;
 use App\Livewire\Instructor\Profile\ProfileForm;
 
-
-Route::get('/', Homepage::class)->name('homepage')->middleware('guest');
-
 // Public/auth routes
+Route::get('/', Homepage::class)->name('home');
 Route::get('/login', Login::class)->name('login')->middleware('guest');
 Route::get('/register', Register::class)->name('register')->middleware('guest');
 
@@ -50,7 +45,8 @@ Route::post('/logout', function (Request $request) {
 })->name('logout');
 
 // User Routes
-    Route::get('/purchased-courses', PurchasedCourses::class)->name('user.courses');
+    Route::get('/purchased-courses', PurchasedCourses::class//ADMIN  
+)->name('user.courses');
     Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
     Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
     Route::get('/course/{courseId}/checkout', CourseCheckout::class)->name('user.checkout');
@@ -98,24 +94,5 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/profile', ProfileForm::class)->name('instructor.profile');
     });
-
-    // Default route for authenticated users
-   Route::get('/', function () {
-    if (auth()->check()) {
-        if (auth()->user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
-        } elseif (auth()->user()->isInstructor()) {
-            return redirect()->route('instructor.dashboard');
-        } else {
-            return redirect()->route('user.dashboard');
-        }
-    } else {
-        return redirect()->route('homepage');
-    }
 });
-
-});
-
-
-
 

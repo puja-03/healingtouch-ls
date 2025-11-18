@@ -46,7 +46,7 @@
                             @auth
                                 <livewire:public.course-checkout :course-id="$course->id" />
                             @else
-                                <a href="{{ route('login') }}" class="block text-center px-4 py-2 bg-pink-600 text-white rounded">Login to Enroll</a>
+                                <a href="{{ route('login', ['intended' => request()->url()]) }}" class="block text-center px-4 py-2 bg-pink-600 text-white rounded hover:bg-pink-700">Login to Enroll</a>
                             @endauth
                         </div>
 
@@ -58,7 +58,7 @@
             </div>
 
             <div class="mt-6">
-                <a href="{{ route('user.browse') }}" class="text-sm text-pink-600 hover:underline">← Back to courses</a>
+                <a href="{{ route('home') }}" class="text-sm text-pink-600 hover:underline">← Back to courses</a>
             </div>
         </div>
     </div>

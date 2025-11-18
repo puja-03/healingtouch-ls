@@ -13,7 +13,7 @@ use Livewire\Attributes\Title;
 use App\Models\Topic;
 use App\Models\Chapters;
 
-#[Layout('components.layouts.user')]
+#[Layout('components.layouts.public')]
 #[Title('Course Checkout')]                 
 class CourseCheckout extends Component
 {
@@ -21,10 +21,6 @@ class CourseCheckout extends Component
     public $course;
     public $orderId = null;
     public $showPayment = false;
-
-    protected $listeners = [
-        'paymentSuccess' => 'handlePaymentSuccess',
-    ];
 
     public function mount($courseId)
     {
@@ -35,10 +31,8 @@ class CourseCheckout extends Component
 
     public function initiateCheckout()
     {
-        // Check if user is logged in
         if (!auth()->check()) {
-            redirect()->route('login');
-            return;
+            return redirect()->guest(route('login'));
         }
 
         // Check if already enrolled
@@ -134,7 +128,8 @@ class CourseCheckout extends Component
             $this->showPayment = false;
             $this->orderId = null;
 
-            return redirect()->route('user.dashboard');
+            // After purchase, send the user to their purchased courses page
+            return redirect()->route('user.courses');
         } catch (\Exception $e) {
             Log::error('Payment verification failed: ' . $e->getMessage());
             session()->flash('error', 'Payment verification failed. Contact support.');
