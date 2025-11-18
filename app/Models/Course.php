@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use App\Models\User;
-use App\Models\Chapter; 
-
+use App\Models\Chapters;
 
 class Course extends Model
 {
@@ -48,7 +49,7 @@ class Course extends Model
 
     public function chapters()
     {
-        return $this->hasMany(Chapter::class); 
+        return $this->hasMany(Chapters::class); 
     }
 
     public function instructor()

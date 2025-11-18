@@ -1,5 +1,11 @@
 <?php
-
+use App\Livewire\Auth\Login;
+use App\Livewire\Auth\Register;
+use App\Livewire\User\Dashboard As UserDashboard;
+use App\Livewire\Public\Homepage;
+use App\Livewire\Public\CourseDetail;
+use App\Livewire\User\PurchasedCourses;
+use App\Livewire\Public\CourseCheckout;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -29,10 +35,8 @@ use App\Livewire\Instructor\Topic\TopicIndex as InstructorTopicIndex;
 use App\Livewire\Instructor\Topic\TopicForm as InstructorTopicForm;
 use App\Livewire\Instructor\Profile\ProfileForm;
 
-//Public 
-use App\Livewire\Auth\Login;
-use App\Livewire\Auth\Register;
-use App\Livewire\User\Dashboard As UserDashboard;
+
+Route::get('/', Homepage::class)->name('homepage')->middleware('guest');
 
 // Public/auth routes
 Route::get('/login', Login::class)->name('login')->middleware('guest');
@@ -44,6 +48,12 @@ Route::post('/logout', function (Request $request) {
 	$request->session()->regenerateToken();
 	return redirect()->route('login');
 })->name('logout');
+
+// User Routes
+    Route::get('/purchased-courses', PurchasedCourses::class)->name('user.courses');
+    Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
+    Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
+    Route::get('/course/{courseId}/checkout', CourseCheckout::class)->name('user.checkout');
 
 Route::middleware('auth')->group(function () {
     // Admin Routes
@@ -89,12 +99,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/profile', ProfileForm::class)->name('instructor.profile');
     });
 
-
-    // User Routes
-    Route::get('/dashboard', UserDashboard::class)->name('user.dashboard');
-
     // Default route for authenticated users
-    Route::get('/', function () {
+   Route::get('/', function () {
+    if (auth()->check()) {
         if (auth()->user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         } elseif (auth()->user()->isInstructor()) {
@@ -102,10 +109,13 @@ Route::middleware('auth')->group(function () {
         } else {
             return redirect()->route('user.dashboard');
         }
-    });
-
-    // User Routes
-    Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
+    } else {
+        return redirect()->route('homepage');
+    }
 });
+
+});
+
+
 
 
