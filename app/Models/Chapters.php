@@ -47,6 +47,6 @@ class Chapters extends Model
 
     public function topics()
     {
-        return $this->hasMany(Topics::class); 
+        return $this->hasMany(Topics::class, 'chapters_id'); 
     }
 }

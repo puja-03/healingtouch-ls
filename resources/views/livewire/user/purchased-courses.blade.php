@@ -41,6 +41,10 @@
                                 class="w-full px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
                             Continue Learning
                         </button>
+                        <a href="{{ route('user.play-course', $enrollment->course->id) }}" 
+                           class="block w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm text-center">
+                            <i class="fas fa-play mr-1"></i>Play Course
+                        </a>
                     </div>
                 </div>
             @empty

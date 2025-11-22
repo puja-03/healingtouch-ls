@@ -127,8 +127,8 @@ class CourseCheckout extends Component
             $this->showPayment = false;
             $this->orderId = null;
 
-            // After purchase, send the user to their purchased courses page
-            return redirect()->route('user.courses');
+            // After purchase, send the user to the course player
+            return redirect()->route('user.play-course', $this->courseId);
         } catch (\Exception $e) {
             Log::error('Payment verification failed: ' . $e->getMessage());
             session()->flash('error', 'Payment verification failed. Contact support.');
