@@ -13,7 +13,7 @@ use Livewire\Attributes\Title;
 use App\Models\Topic;
 use App\Models\Chapters;
 
-#[Layout('components.layouts.public')]
+#[Layout('components.layouts.user')]
 #[Title('Course Checkout')]                 
 class CourseCheckout extends Component
 {
@@ -88,7 +88,6 @@ class CourseCheckout extends Component
     public function handlePaymentSuccess($paymentData)
     {
         try {
-            // Verify payment signature
             $api = new Api(
                 config('razorpay.razorpay.key'),
                 config('razorpay.razorpay.secret')

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\InstructorMiddleware;
+use App\Http\Middleware\UserMiddleware;
 //ADMIN  
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\CourseList; 
@@ -43,13 +44,6 @@ Route::post('/logout', function (Request $request) {
 	$request->session()->regenerateToken();
 	return redirect()->route('login');
 })->name('logout');
-
-// User Routes
-    Route::get('/purchased-courses', PurchasedCourses::class//ADMIN  
-)->name('user.courses');
-    Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
-    Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
-    Route::get('/course/{courseId}/checkout', CourseCheckout::class)->name('user.checkout');
 
 Route::middleware('auth')->group(function () {
     // Admin Routes
@@ -94,5 +88,13 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/profile', ProfileForm::class)->name('instructor.profile');
     });
+
+    Route::middleware(UserMiddleware::class)->prefix('user')->group(function () {
+        Route::get('/purchased-courses', PurchasedCourses::class)->name('user.courses');
+        Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
+        Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
+        Route::get('/course/{courseId}/checkout', CourseCheckout::class)->name('user.checkout'); 
+    });
+
 });
 
