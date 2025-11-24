@@ -88,6 +88,10 @@
                     </h3>
                 </div>
                 <nav class="space-y-1">
+                     <a href="{{ route('home') }}" wire:navigate
+                        class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200">
+                        <i class="fas fa-book mr-3 text-gray-500"></i> Home
+                    </a>
                     <a href="{{ route('user.dashboard') }}" wire:navigate
                         class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200">
                         <i class="fas fa-chart-bar mr-3 text-gray-500"></i>Dashboard
@@ -96,7 +100,7 @@
                         class="flex items-center px-3 py-2 text-gray-700 rounded-lg hover:bg-primary-50 hover:text-primary-600 transition-colors duration-200">
                         <i class="fas fa-book mr-3 text-gray-500"></i>Purchased Courses
                     </a>
-
+     
                     <!-- Mobile User Info -->
                     
                     <div class="pt-4 mt-4 border-t md:hidden">

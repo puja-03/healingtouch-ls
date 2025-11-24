@@ -17,7 +17,7 @@
     <main class="py-6">
         @yield('content')
     </main>
-
+   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 
 </html>
