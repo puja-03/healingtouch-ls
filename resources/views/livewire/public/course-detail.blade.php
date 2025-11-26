@@ -26,7 +26,8 @@
                             <p class="text-gray-600 text-sm">Chapters</p>
                         </div>
                         <div class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg p-4 text-center">
-                            <p class="text-3xl font-bold text-blue-600">{{ $course->chapters->sum(fn($c) => $c->topics->count()) }}</p>
+                            <p class="text-3xl font-bold text-blue-600">
+                                {{ $course->chapters->sum(fn($c) => $c->topics->count()) }}</p>
                             <p class="text-gray-600 text-sm">Topics</p>
                         </div>
                         <div class="bg-gradient-to-br from-green-100 to-green-50 rounded-lg p-4 text-center">
@@ -69,14 +70,40 @@
 
                         <!-- CTA Button -->
                         <div class="mb-6">
-                            @auth
+                            {{-- @auth
                                 <livewire:public.course-checkout :course-id="$course->id" />
                             @else
                                 <a href="{{ route('login', ['intended' => request()->url()]) }}" 
                                    class="block text-center px-4 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-semibold">
                                     <i class="fas fa-lock mr-2"></i>Login to Enroll
                                 </a>
+                           @endauth --}}
+                            @auth
+                                @php
+                                    $isEnrolled = App\Models\Enrollment::where('user_id', auth()->id())
+                                        ->where('course_id', $course->id)
+                                        ->where('status', 'completed')
+                                        ->exists();
+                                @endphp
+
+                                @if ($isEnrolled)
+                                    <a href="{{ route('user.play-course', $course->id) }}"
+                                        class="block text-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
+                                        Start Learning
+                                    </a>
+                                @else
+                                    <a href="{{ route('payment.checkout', $course->id) }}"
+                                        class="block text-center px-4 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-semibold">
+                                        Enroll Now - ₹{{ number_format($course->price, 0) }}
+                                    </a>
+                                @endif
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="block text-center px-4 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-semibold">
+                                    Login to Enroll
+                                </a>
                             @endauth
+
                         </div>
 
                         <!-- Info Box -->

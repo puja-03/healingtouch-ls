@@ -5,7 +5,7 @@ use App\Livewire\Auth\Register;
 use App\Livewire\User\Dashboard As UserDashboard;
 use App\Livewire\Public\CourseDetail;
 use App\Livewire\User\PurchasedCourses;
-use App\Livewire\Public\CourseCheckout;
+// use App\Livewire\Public\CourseCheckout;
 use App\Livewire\Public\CoursePlayer;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\InstructorMiddleware;
 use App\Http\Middleware\UserMiddleware;
+use App\Http\Controllers\PaymentController;
 //ADMIN  
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\CourseList; 
@@ -34,11 +35,19 @@ use App\Livewire\Instructor\Topic\TopicIndex as InstructorTopicIndex;
 use App\Livewire\Instructor\Topic\TopicForm as InstructorTopicForm;
 use App\Livewire\Instructor\Profile\ProfileForm;
 
-// Public/auth routes
+// Public/auth routesuse App\Livewire\Public\CourseCheckout;
+
 Route::get('/', Homepage::class)->name('home');
 Route::get('/login', Login::class)->name('login')->middleware('guest');
 Route::get('/register', Register::class)->name('register')->middleware('guest');
 Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
+// Razorpay payment routes
+
+Route::get('/course/{course}/checkout', [PaymentController::class, 'showCheckout'])->name('payment.checkout');
+Route::post('/create-order', [PaymentController::class, 'createOrder'])->name('payment.create-order');
+Route::post('/payment/success', [PaymentController::class, 'handleSuccess'])->name('payment.success');
+
+     
 
 Route::post('/logout', function (Request $request) {
 	Auth::logout();
@@ -94,7 +103,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(UserMiddleware::class)->prefix('user')->group(function () {
         Route::get('/purchased-courses', PurchasedCourses::class)->name('user.courses');
         Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
-        Route::get('/course/{courseId}/checkout', CourseCheckout::class)->name('user.checkout');
+        // Route::get('/course/{courseId}/checkout', CourseCheckout::class)->name('user.checkout');
         Route::get('/play/{courseId}', CoursePlayer::class)->name('user.play-course');
     });
 
