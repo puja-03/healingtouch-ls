@@ -14,6 +14,7 @@ class Login extends Component
     public $email;
     public $password;
     public $remember = false;
+    public $isLoading = false;
 
     protected function rules()
     {
@@ -25,6 +26,7 @@ class Login extends Component
 
     public function authenticate()
     {
+        $this->isLoading = true;
         $this->validate();
 
         if (Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
@@ -40,12 +42,12 @@ class Login extends Component
             } else {
                 $default = route('user.dashboard');
             }
-
-            // Redirect to intended URL if present (preserves flow when login is required before checkout)
             return redirect()->intended($default);
         }
 
         $this->addError('email', 'The provided credentials do not match our records.');
+            $this->isLoading = false;
+
     }
 
     public function render()

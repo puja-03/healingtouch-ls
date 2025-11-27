@@ -1,12 +1,4 @@
 <div class="min-h-screen">
-    {{-- Search Bar --}}
-    <div class=" px-4 py-8">
-        <input type="text" 
-               wire:model.debounce.300ms="search" 
-               placeholder="Search courses by title or description..."
-               class="w-full rounded-lg border-gray-300 px-4 py-3 shadow-sm focus:ring-pink-500 focus:border-pink-500">
-    </div>
-
     {{-- Courses Grid --}}
     <div class="px-4 pb-16">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

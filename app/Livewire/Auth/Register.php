@@ -17,18 +17,23 @@ class Register extends Component
     public $email;
     public $password;
     public $password_confirmation;
+    public $terms = false;
+    public $isLoading = false;
+
 
     protected function rules()
     {
         return [
             'name' => 'required|string|min:2',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:6|confirmed', 
+            'terms' => 'accepted'
         ];
     }
 
     public function register()
     {
+        $this->isLoading = true;
         $this->validate();
 
         $user = User::create([
@@ -42,8 +47,9 @@ class Register extends Component
         ]);
 
         Auth::login($user);
+        $this->isLoading = false;
 
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('user.dashboard');
     }
 
     public function render()
