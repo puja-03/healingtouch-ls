@@ -18,18 +18,31 @@ class CoursePlayer extends Component
     public $expandedChapter = null;
     public $isEnrolled = false;
 
-    public function mount($courseId)
+    public function mount($course)
     {
-        $this->courseId = $courseId;
-        $this->course = Course::with(['chapters.topics'])
-            ->where('is_published', true)
-            ->findOrFail($courseId);
+        // Accept either a Course model (route-model binding), a slug or a numeric id
+        if ($course instanceof Course) {
+            $this->course = $course;
+            $this->courseId = $this->course->id;
+        } elseif (is_numeric($course)) {
+            $this->course = Course::with(['chapters.topics'])
+                ->where('is_published', true)
+                ->findOrFail($course);
+            $this->courseId = $this->course->id;
+        } else {
+            // treat as slug
+            $this->course = Course::with(['chapters.topics'])
+                ->where('is_published', true)
+                ->where('slug', $course)
+                ->firstOrFail();
+            $this->courseId = $this->course->id;
+        }
 
         // Check if user is enrolled
         if (auth()->check()) {
+            // Treat any enrollment record as enrollment (ignore status)
             $this->isEnrolled = Enrollment::where('user_id', auth()->id())
                 ->where('course_id', $this->courseId)
-                ->where('status', 'completed')
                 ->exists();
         }
 

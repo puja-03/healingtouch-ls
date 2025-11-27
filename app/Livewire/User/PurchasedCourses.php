@@ -2,7 +2,7 @@
 
 namespace App\Livewire\User;
 
-use App\Models\Enrollment;
+use App\Models\Payment;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
@@ -26,7 +26,7 @@ class PurchasedCourses extends Component
 
     public function selectCourse($courseId)
     {
-        $this->selectedCourse = Enrollment::where('user_id', auth()->id())
+        $this->selectedCourse = Payment::where('user_id', auth()->id())
             ->where('status', 'completed')
             ->with('course')
             ->findOrFail($courseId);
@@ -39,7 +39,7 @@ class PurchasedCourses extends Component
 
     public function render()
     {
-        $query = Enrollment::where('user_id', auth()->id())
+        $query = Payment::where('user_id', auth()->id())
             ->where('status', 'completed')
             ->with('course');
 
@@ -49,10 +49,10 @@ class PurchasedCourses extends Component
             });
         }
 
-        $enrollments = $query->orderBy('enrolled_at', 'desc')->paginate(9);
+        $payments = $query->orderBy('created_at', 'desc')->paginate(9);
 
         return view('livewire.user.purchased-courses', [
-            'enrollments' => $enrollments,
+            'payments' => $payments,
         ]);
     }
 }

@@ -11,10 +11,17 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentController
 {
-    public function showCheckout($courseId)
+    public function showCheckout($courseParam)
     {
-        $course = Course::findOrFail($courseId);
-        
+        // Accept Course model (route-model binding), slug or id
+        if ($courseParam instanceof Course) {
+            $course = $courseParam;
+        } elseif (is_numeric($courseParam)) {
+            $course = Course::findOrFail($courseParam);
+        } else {
+            $course = Course::where('slug', $courseParam)->firstOrFail();
+        }
+
         return view('payment.checkout', compact('course'));
     }
 
@@ -34,7 +41,8 @@ class PaymentController
             ->first();
 
         if ($existing) {
-            return redirect()->route('user.play-course', $course->id);
+            // Redirect using the slug-based parameter expected by user.play-course
+            return redirect()->route('user.play-course', ['course' => $course->slug]);
         }
 
         try {
@@ -107,8 +115,10 @@ class PaymentController
                     'enrolled_at' => now(),
                 ]);
 
-                return redirect()->route('user.play-course', $payment->course_id)
-                    ->with('success', 'Payment successful! You are now enrolled.');
+                    // Redirect using the slug-based route parameter expected by user.play-course
+                    $course = Course::find($payment->course_id);
+                    return redirect()->route('user.play-course', ['course' => $course->slug])
+                        ->with('success', 'Payment successful! You are now enrolled.');
             }
 
         } catch (\Exception $e) {

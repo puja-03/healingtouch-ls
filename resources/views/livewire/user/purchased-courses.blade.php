@@ -17,14 +17,13 @@
 
         {{-- Enrolled Courses --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($enrollments as $enrollment)
+            @forelse($payments as $payment)
                 <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
                     <div class="h-40 bg-gradient-to-r from-pink-400 to-pink-600 flex items-center justify-center">
                         <span class="text-white text-4xl">📚</span>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $enrollment->course->title }}</h3>
-                        <p class="text-xs text-gray-500 mb-4">Enrolled {{ $enrollment->enrolled_at->format('M d, Y') }}</p>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $payment->course->title }}</h3>
                         
                         {{-- Progress Bar --}}
                         <div class="mb-4">
@@ -37,11 +36,12 @@
                             </div>
                         </div>
 
-                        <button wire:click="selectCourse({{ $enrollment->id }})" 
-                                class="w-full px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
-                            Continue Learning
-                        </button>
-                        <a href="{{ route('user.play-course', $enrollment->course->id) }}" 
+                        <!-- Directly open the course player for the purchased course -->
+                        <a href="{{ route('user.play-course', ['course' => $payment->course->slug]) }}"
+                           class="w-full inline-block text-center px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
+                            <i class="fas fa-play mr-1"></i>Continue Learning
+                        </a>
+                        <a href="{{ route('user.play-course', ['course' => $payment->course->slug]) }}" 
                            class="block w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm text-center">
                             <i class="fas fa-play mr-1"></i>Play Course
                         </a>
@@ -59,7 +59,7 @@
 
         {{-- Pagination --}}
         <div class="mt-12">
-            {{ $enrollments->links() }}
+            {{ $payments->links() }}
         </div>
     </div>
 

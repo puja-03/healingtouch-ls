@@ -22,10 +22,34 @@
                         
                         <div class="flex items-center justify-between">
                             <span class="text-2xl font-bold text-pink-600">₹{{ number_format($course->price, 0) }}</span>
-                            <a href="{{ route('courses.show', $course->slug) }}" 
-                                    class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
-                                View
-                            </a>
+                            @auth
+                                @php
+                                    $isEnrolledOnHome = in_array($course->id, $enrolledCourseIds ?? []);
+                                @endphp
+
+                                @if($isEnrolledOnHome)
+                                    <a href="{{ route('user.play-course', ['course' => $course->slug]) }}"
+                                       class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm">
+                                        Start Learning
+                                    </a>
+                                @else
+                                    <div class="space-x-2">
+                                        <a href="{{ route('courses.show', $course->slug) }}"
+                                           class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition text-sm">
+                                            View
+                                        </a>
+                                        <a href="{{ route('payment.checkout', ['course' => $course->slug]) }}"
+                                           class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
+                                            Enroll
+                                        </a>
+                                    </div>
+                                @endif
+                            @else
+                                <a href="{{ route('courses.show', $course->slug) }}" 
+                                        class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
+                                    View
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 </div>

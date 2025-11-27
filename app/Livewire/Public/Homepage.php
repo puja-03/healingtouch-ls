@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use App\Models\Topic;
 use App\Models\Chapters;
+use App\Models\Enrollment;
 
 #[Layout('components.layouts.app')]
 #[Title('homepage')]
@@ -50,8 +51,17 @@ class Homepage extends Component
 
         $courses = $query->with('user')->orderBy('created_at', 'desc')->paginate(9);
 
+        $enrolledCourseIds = [];
+        if (auth()->check()) {
+            // Consider any enrollment record as enrolled (ignore status values)
+            $enrolledCourseIds = Enrollment::where('user_id', auth()->id())
+                ->pluck('course_id')
+                ->toArray();
+        }
+
         return view('livewire.public.homepage', [
             'courses' => $courses,
+            'enrolledCourseIds' => $enrolledCourseIds,
         ]);
     }
 }

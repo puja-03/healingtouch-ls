@@ -80,19 +80,19 @@
                            @endauth --}}
                             @auth
                                 @php
-                                    $isEnrolled = App\Models\Enrollment::where('user_id', auth()->id())
+                                    // Consider any enrollment record as enrolled (ignore enrollment status)
+                                    $isEnrolled = Enrollment::where('user_id', auth()->id())
                                         ->where('course_id', $course->id)
-                                        ->where('status', 'completed')
                                         ->exists();
                                 @endphp
 
                                 @if ($isEnrolled)
-                                    <a href="{{ route('user.play-course', $course->id) }}"
+                                    <a href="{{ route('user.play-course', ['course' => $course->slug]) }}"
                                         class="block text-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
                                         Start Learning
                                     </a>
                                 @else
-                                    <a href="{{ route('payment.checkout', $course->id) }}"
+                                    <a href="{{ route('payment.checkout', ['course' => $course->slug]) }}"
                                         class="block text-center px-4 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-semibold">
                                         Enroll Now - ₹{{ number_format($course->price, 0) }}
                                     </a>

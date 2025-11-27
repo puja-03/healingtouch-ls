@@ -40,14 +40,31 @@ use App\Livewire\Instructor\Profile\ProfileForm;
 Route::get('/', Homepage::class)->name('home');
 Route::get('/login', Login::class)->name('login')->middleware('guest');
 Route::get('/register', Register::class)->name('register')->middleware('guest');
+Route::get('/courses/{id}', function ($id) {
+    if (auth()->check()) {
+        $enrolled = \App\Models\Enrollment::where('user_id', auth()->id())
+            ->where('course_id', $id)
+            ->where('status', 'completed')
+            ->exists();
+
+        if ($enrolled) {
+            $course = \App\Models\Course::find($id);
+            if ($course) {
+                return redirect()->route('user.play-course', ['course' => $course->slug]);
+            }
+        }
+        return redirect()->route('user.courses');
+    }
+
+    return redirect()->route('login', ['intended' => url()->current()]);
+})->where('id', '[0-9]+');
+
 Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
 // Razorpay payment routes
 
 Route::get('/course/{course}/checkout', [PaymentController::class, 'showCheckout'])->name('payment.checkout');
 Route::post('/create-order', [PaymentController::class, 'createOrder'])->name('payment.create-order');
 Route::post('/payment/success', [PaymentController::class, 'handleSuccess'])->name('payment.success');
-
-     
 
 Route::post('/logout', function (Request $request) {
 	Auth::logout();
@@ -79,7 +96,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/instructors/create', InstructorForm::class)->name('admin.instructors.create');
         Route::get('/instructors/{instructor_id}/edit', InstructorForm::class)->name('admin.instructors.edit');
     });
-
     // Instructor Routes
     Route::middleware(InstructorMiddleware::class)->prefix('instructor')->group(function () {
         Route::get('/', InstructorDashboard::class)->name('instructor.dashboard');
@@ -103,9 +119,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware(UserMiddleware::class)->prefix('user')->group(function () {
         Route::get('/purchased-courses', PurchasedCourses::class)->name('user.courses');
         Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
-        // Route::get('/course/{courseId}/checkout', CourseCheckout::class)->name('user.checkout');
-        Route::get('/play/{courseId}', CoursePlayer::class)->name('user.play-course');
+        Route::get('/course/{course:slug}', CoursePlayer::class)->name('user.play-course');
+
     });
 
 });
-
