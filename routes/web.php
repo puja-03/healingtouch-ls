@@ -55,13 +55,10 @@ Route::get('/courses/{id}', function ($id) {
         }
         return redirect()->route('user.courses');
     }
-
     return redirect()->route('login', ['intended' => url()->current()]);
 })->where('id', '[0-9]+');
 
 Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
-// Razorpay payment routes
-
 Route::get('/course/{course}/checkout', [PaymentController::class, 'showCheckout'])->name('payment.checkout');
 Route::post('/create-order', [PaymentController::class, 'createOrder'])->name('payment.create-order');
 Route::post('/payment/success', [PaymentController::class, 'handleSuccess'])->name('payment.success');

@@ -6,7 +6,6 @@
                 Browse More Courses
             </a>
         </div>
-
         {{-- Search --}}
         <div class="mb-8">
             <input type="text" 
@@ -14,7 +13,6 @@
                    placeholder="Search your courses..."
                    class="w-full rounded-lg border-gray-300 px-4 py-3 shadow-sm focus:ring-pink-500 focus:border-pink-500">
         </div>
-
         {{-- Enrolled Courses --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($payments as $payment)
@@ -40,10 +38,6 @@
                         <a href="{{ route('user.play-course', ['course' => $payment->course->slug]) }}"
                            class="w-full inline-block text-center px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
                             <i class="fas fa-play mr-1"></i>Continue Learning
-                        </a>
-                        <a href="{{ route('user.play-course', ['course' => $payment->course->slug]) }}" 
-                           class="block w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm text-center">
-                            <i class="fas fa-play mr-1"></i>Play Course
                         </a>
                     </div>
                 </div>

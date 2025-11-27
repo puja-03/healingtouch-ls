@@ -26,14 +26,16 @@
                                     </a>
                                 @else
                                     <div class="space-x-2">
-                                        <a href="{{ route('courses.show', $course->slug) }}"
-                                           class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition text-sm">
-                                            View
-                                        </a>
-                                        <a href="{{ route('payment.checkout', ['course' => $course->slug]) }}"
-                                           class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
-                                            Enroll
-                                        </a>
+                                        <div class="space-x-2">
+                                            <a href="{{ route('courses.show', $course->slug) }}"
+                                               class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition text-sm">
+                                                View
+                                            </a>
+                                            <a href="{{ route('courses.show', $course->slug) }}"
+                                               class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
+                                                Enroll
+                                            </a>
+                                        </div>
                                     </div>
                                 @endif
                             @else

@@ -81,7 +81,7 @@
                             @auth
                                 @php
                                     // Consider any enrollment record as enrolled (ignore enrollment status)
-                                    $isEnrolled = Enrollment::where('user_id', auth()->id())
+                                    $isEnrolled = App\Models\Enrollment::where('user_id', auth()->id())
                                         ->where('course_id', $course->id)
                                         ->exists();
                                 @endphp

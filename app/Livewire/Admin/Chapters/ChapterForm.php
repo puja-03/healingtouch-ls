@@ -64,6 +64,8 @@ class ChapterForm extends Component
             $chapter->update($data);
             session()->flash('success', 'Chapter updated successfully!');
             } else {
+                // Ensure user_id is set when creating a chapter to satisfy DB constraints
+                $data['user_id'] = auth()->id();
                 Chapters::create($data);
                 $message = 'Chapter created successfully!';
             }
