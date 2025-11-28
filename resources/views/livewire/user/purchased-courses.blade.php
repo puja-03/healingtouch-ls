@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 py-8">
+<div class="min-h-screen">
+    <div class=" px-4 py-8">
         <div class="flex items-center justify-between mb-8">
             <h1 class="text-3xl font-bold">My Learning Dashboard</h1>
             <a href="/" class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">
