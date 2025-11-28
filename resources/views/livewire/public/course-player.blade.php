@@ -1,16 +1,16 @@
-<div class="min-h-screen bg-gray-100">
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
+<div class="min-h-screen">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <!-- Main Content -->
         <div class="lg:col-span-3">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <!-- Video Player -->
                 <div class="bg-black aspect-video flex items-center justify-center">
                     @if($selectedTopic && $videoUrl)
-                        <video id="courseVideo" 
-                               class="w-full h-full" 
-                               controls 
-                               crossorigin="anonymous"
-                               data-setup='{"controls": true, "autoplay": false, "preload": "auto"}'>
+               <video id="courseVideo" 
+                   class="video-js w-full h-full" 
+                   controls 
+                   crossorigin="anonymous"
+                   data-setup='{"controls": true, "autoplay": false, "preload": "auto"}'>
                             <source src="{{ $videoUrl }}" type="video/mp4">
                             Your browser does not support HTML5 video.
                         </video>

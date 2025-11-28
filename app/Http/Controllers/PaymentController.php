@@ -22,6 +22,28 @@ class PaymentController
             $course = Course::where('slug', $courseParam)->firstOrFail();
         }
 
+        // If course is free (price 0) create enrollment directly and redirect to player
+        if ((float)$course->price <= 0) {
+            // check existing
+            $existing = Enrollment::where('user_id', auth()->id())
+                ->where('course_id', $course->id)
+                ->first();
+
+            if (!$existing) {
+                Enrollment::create([
+                    'user_id' => auth()->id(),
+                    'course_id' => $course->id,
+                    'payment_id' => null,
+                    'amount' => $course->price,
+                    'currency' => 'INR',
+                    'status' => 'completed',
+                    'enrolled_at' => now(),
+                ]);
+            }
+
+            return redirect()->route('user.play-course', ['course' => $course->slug]);
+        }
+
         return view('payment.checkout', compact('course'));
     }
 
@@ -111,6 +133,8 @@ class PaymentController
                     'user_id' => auth()->id(),
                     'course_id' => $payment->course_id,
                     'payment_id' => $payment->id,
+                    'amount' => $payment->amount ?? $course->price ?? 0,
+                    'currency' => $payment->currency ?? 'INR',
                     'status' => 'completed',
                     'enrolled_at' => now(),
                 ]);

@@ -32,7 +32,7 @@
 
             <!-- Navigation Menu -->
             <nav class="flex items-center space-x-8">
-                <a href="#" class="text-gray-700 hover:text-blue-600 font-medium transition duration-200 relative group">
+                <a href="{{ route('home') }}" class="text-gray-700 hover:text-blue-600 font-medium transition duration-200 relative group">
                     Courses
                     <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-200 group-hover:w-full"></span>
                 </a>
