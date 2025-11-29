@@ -12,78 +12,77 @@ use Livewire\Attributes\Title;
 #[Title('Course Player')]
 class CoursePlayer extends Component
 {
-    public $courseId;
     public $course;
-    public $selectedTopic = null;
-    public $expandedChapter = null;
-    public $isEnrolled = false;
+    public $selectedTopicId = null;
+    public $expandedChapterId = null;
+    public $videoUrl = null;
+    public $selectedTopic = null; // Add this line
 
     public function mount($course)
     {
-        // Accept either a Course model (route-model binding), a slug or a numeric id
+        // Load course
         if ($course instanceof Course) {
             $this->course = $course;
-            $this->courseId = $this->course->id;
         } elseif (is_numeric($course)) {
             $this->course = Course::with(['chapters.topics'])
                 ->where('is_published', true)
                 ->findOrFail($course);
-            $this->courseId = $this->course->id;
         } else {
-            // treat as slug
             $this->course = Course::with(['chapters.topics'])
                 ->where('is_published', true)
                 ->where('slug', $course)
                 ->firstOrFail();
-            $this->courseId = $this->course->id;
         }
 
-        // Check if user is enrolled
+        // Check enrollment
         if (auth()->check()) {
-            // Treat any enrollment record as enrollment (ignore status)
-            $this->isEnrolled = Enrollment::where('user_id', auth()->id())
-                ->where('course_id', $this->courseId)
+            $isEnrolled = Enrollment::where('user_id', auth()->id())
+                ->where('course_id', $this->course->id)
                 ->exists();
+                
+            if (!$isEnrolled) {
+                return redirect()->route('courses.show', $this->course->slug);
+            }
         }
 
-        // If not enrolled, redirect to course detail
-        if (!$this->isEnrolled) {
-            return redirect()->route('courses.show', $this->course->slug);
-        }
-
-        // Select first topic by default
-        if ($this->course->chapters->count() > 0 && $this->course->chapters[0]->topics->count() > 0) {
-            $this->selectedTopic = $this->course->chapters[0]->topics[0];
-            $this->expandedChapter = $this->course->chapters[0]->id;
-        }
-    }
-
-    public function selectTopic($topicId)
-    {
-        foreach ($this->course->chapters as $chapter) {
-            foreach ($chapter->topics as $topic) {
-                if ($topic->id == $topicId) {
-                    $this->selectedTopic = $topic;
-                    $this->expandedChapter = $chapter->id;
-                    return;
-                }
+        // Set initial state
+        $firstChapter = $this->course->chapters->first();
+        if ($firstChapter) {
+            $this->expandedChapterId = $firstChapter->id;
+            $firstTopic = $firstChapter->topics->first();
+            if ($firstTopic) {
+                $this->selectedTopicId = $firstTopic->id;
+                $this->selectedTopic = $firstTopic; // Set selected topic
+                $this->videoUrl = $firstTopic->video_url;
             }
         }
     }
 
     public function toggleChapter($chapterId)
     {
-        if ($this->expandedChapter === $chapterId) {
-            $this->expandedChapter = null;
-        } else {
-            $this->expandedChapter = $chapterId;
+        // Toggle chapter - if same chapter, close it; else open new one
+        $this->expandedChapterId = $this->expandedChapterId === $chapterId ? null : $chapterId;
+    }
+
+    public function selectTopic($topicId)
+    {
+        $this->selectedTopicId = $topicId;
+        
+        // Find the topic and set video URL
+        foreach ($this->course->chapters as $chapter) {
+            foreach ($chapter->topics as $topic) {
+                if ($topic->id == $topicId) {
+                    $this->selectedTopic = $topic; // Set the selected topic object
+                    $this->videoUrl = $topic->video_url;
+                    $this->expandedChapterId = $chapter->id; // Keep chapter open
+                    break 2;
+                }
+            }
         }
     }
 
     public function render()
     {
-        return view('livewire.public.course-player', [
-            'videoUrl' => $this->selectedTopic ? $this->selectedTopic->video_url : null,
-        ]);
+        return view('livewire.public.course-player');
     }
 }

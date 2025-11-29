@@ -1,5 +1,5 @@
 <div>
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div class="w-full bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div class="max-w-md w-full">
             <!-- Logo/Brand -->
             <div class="text-center mb-8">

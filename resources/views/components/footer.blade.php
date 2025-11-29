@@ -1,6 +1,6 @@
 <footer class="bg-gradient-to-br from-gray-900 to-gray-800 text-white">
     <!-- Main Footer -->
-    <div class="container mx-auto px-4 py-12">
+    <div class="w-full px-4 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Brand Column -->
             <div class="lg:col-span-1">

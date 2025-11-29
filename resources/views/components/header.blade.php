@@ -1,5 +1,5 @@
 <header class="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
-    <div class="container mx-auto px-4">
+    <div class="w-full px-4">
         <!-- Top Bar -->
         <div class="flex items-center justify-between py-4">
             <!-- Logo -->

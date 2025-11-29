@@ -4,7 +4,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($courses as $course)
                 <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
-                    <div class="h-48 bg-gradient-to-r from-pink-400 to-pink-600 flex items-center justify-center">
+                    <div class="h-48 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
                         <span class="text-white text-4xl">📚</span>
                     </div>
                     <div class="p-6">
@@ -32,7 +32,7 @@
                                                 View
                                             </a>
                                             <a href="{{ route('courses.show', $course->slug) }}"
-                                               class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
+                                               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
                                                 Enroll
                                             </a>
                                         </div>
@@ -40,7 +40,7 @@
                                 @endif
                             @else
                                 <a href="{{ route('courses.show', $course->slug) }}" 
-                                        class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
                                     View
                                 </a>
                             @endauth

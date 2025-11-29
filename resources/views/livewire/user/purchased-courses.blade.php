@@ -2,7 +2,7 @@
     <div class=" px-4 py-8">
         <div class="flex items-center justify-between mb-8">
             <h1 class="text-3xl font-bold">My Learning Dashboard</h1>
-            <a href="/" class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700">
+            <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-pink-700">
                 Browse More Courses
             </a>
         </div>
@@ -17,7 +17,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @forelse($enrollments as $enrollment)
                 <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
-                    <div class="h-40 bg-gradient-to-r from-pink-400 to-pink-600 flex items-center justify-center">
+                    <div class="h-40 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
                         <span class="text-white text-4xl">📚</span>
                     </div>
                     <div class="p-6">
@@ -36,7 +36,7 @@
 
                         <!-- Directly open the course player for the purchased course -->
                         <a href="{{ route('user.play-course', ['course' => $enrollment->course->slug]) }}"
-                           class="w-full inline-block text-center px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition text-sm">
+                           class="w-full inline-block text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
                             <i class="fas fa-play mr-1"></i>Continue Learning
                         </a>
                     </div>
