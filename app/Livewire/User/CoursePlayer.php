@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Public;
+namespace App\Livewire\User;
 
 use App\Models\Course;
 use App\Models\Enrollment;
@@ -8,21 +8,20 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 
-#[Layout('components.layouts.user')]
 #[Title('Course Player')]
+// #[Layout('components.layouts.user')]
 class CoursePlayer extends Component
 {
     public $course;
-    public $selectedTopicId = null;
-    public $expandedChapterId = null;
-    public $videoUrl = null;
-    public $selectedTopic = null; // Add this line
+    public $selectedTopicId;
+    public $expandedChapterId;
+    public $videoUrl;
 
     public function mount($course)
     {
         // Load course
         if ($course instanceof Course) {
-            $this->course = $course;
+            $this->course = $course->load(['chapters.topics']);
         } elseif (is_numeric($course)) {
             $this->course = Course::with(['chapters.topics'])
                 ->where('is_published', true)
@@ -46,13 +45,13 @@ class CoursePlayer extends Component
         }
 
         // Set initial state
-        $firstChapter = $this->course->chapters->first();
-        if ($firstChapter) {
+        if ($this->course->chapters->first()) {
+            $firstChapter = $this->course->chapters->first();
             $this->expandedChapterId = $firstChapter->id;
-            $firstTopic = $firstChapter->topics->first();
-            if ($firstTopic) {
+            
+            if ($firstChapter->topics->first()) {
+                $firstTopic = $firstChapter->topics->first();
                 $this->selectedTopicId = $firstTopic->id;
-                $this->selectedTopic = $firstTopic; // Set selected topic
                 $this->videoUrl = $firstTopic->video_url;
             }
         }
@@ -60,21 +59,21 @@ class CoursePlayer extends Component
 
     public function toggleChapter($chapterId)
     {
-        // Toggle chapter - if same chapter, close it; else open new one
+        // If clicking same chapter, close it. Else open new chapter
         $this->expandedChapterId = $this->expandedChapterId === $chapterId ? null : $chapterId;
     }
 
     public function selectTopic($topicId)
     {
         $this->selectedTopicId = $topicId;
-        
+
         // Find the topic and set video URL
         foreach ($this->course->chapters as $chapter) {
             foreach ($chapter->topics as $topic) {
                 if ($topic->id == $topicId) {
-                    $this->selectedTopic = $topic; // Set the selected topic object
                     $this->videoUrl = $topic->video_url;
                     $this->expandedChapterId = $chapter->id; // Keep chapter open
+                    $this->dispatch('playVideo'); // Dispatch event for video.js
                     break 2;
                 }
             }
@@ -83,6 +82,21 @@ class CoursePlayer extends Component
 
     public function render()
     {
-        return view('livewire.public.course-player');
+        // Find selected topic for display
+        $selectedTopic = null;
+        if ($this->selectedTopicId) {
+            foreach ($this->course->chapters as $chapter) {
+                foreach ($chapter->topics as $topic) {
+                    if ($topic->id == $this->selectedTopicId) {
+                        $selectedTopic = $topic;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return view('livewire.user.course-player', [
+            'selectedTopic' => $selectedTopic,
+        ]);
     }
 }

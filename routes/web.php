@@ -5,7 +5,6 @@ use App\Livewire\Auth\Register;
 use App\Livewire\User\Dashboard As UserDashboard;
 use App\Livewire\Public\CourseDetail;
 use App\Livewire\User\PurchasedCourses;
-// use App\Livewire\Public\CourseCheckout;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -97,7 +96,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(UserMiddleware::class)->prefix('user')->group(function () {
         Route::get('/purchased-courses', PurchasedCourses::class)->name('user.courses');
         Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
-        Route::get('/course/{course:slug}', \App\Livewire\Public\CoursePlayer::class)->name('user.play-course');
+        Route::get('/course/{course:slug}', \App\Livewire\User\CoursePlayer::class)->name('user.play-course');
     });
 
 });

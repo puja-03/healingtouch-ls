@@ -6,13 +6,18 @@
                 <!-- Video Player -->
                 <div class="bg-black aspect-video flex items-center justify-center">
                     @if($videoUrl)
+                        <!-- Video.js Player -->
                         <video 
-                            id="courseVideo"
-                            class="w-full h-full"
+                            id="my-video"
+                            class="video-js vjs-default-skin w-full h-full"
                             controls
-                            preload="metadata">
+                            preload="auto"
+                            data-setup='{}'>
                             <source src="{{ $videoUrl }}" type="video/mp4">
-                            Your browser does not support the video tag.
+                            <p class="vjs-no-js">
+                                To view this video please enable JavaScript, and consider upgrading to a
+                                web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                            </p>
                         </video>
                     @else
                         <div class="text-white text-center">
@@ -111,4 +116,63 @@
             </div>
         </div>
     </div>
+
+    <!-- Video.js CSS & JS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+
+    <script>
+        let player = null;
+
+        // Function to initialize video.js player
+        function initializeVideoPlayer() {
+            const videoElement = document.getElementById('my-video');
+            
+            if (videoElement && !videoElement.classList.contains('vjs-ended')) {
+                // Dispose existing player
+                if (player) {
+                    player.dispose();
+                }
+                
+                // Initialize new player
+                player = videojs('my-video', {
+                    controls: true,
+                    autoplay: true, // Auto-play when topic is selected
+                    preload: 'auto',
+                    responsive: true,
+                    fluid: true
+                });
+
+                player.ready(function() {
+                    console.log('Video.js player ready');
+                });
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeVideoPlayer, 500);
+        });
+
+        // Listen for Livewire playVideo event
+        document.addEventListener('livewire:init', function() {
+            Livewire.on('playVideo', function() {
+                console.log('Play video event received');
+                
+                // Wait for Livewire to update DOM, then initialize and play
+                setTimeout(function() {
+                    initializeVideoPlayer();
+                }, 300);
+            });
+        });
+
+        // Reinitialize when Livewire updates DOM
+        document.addEventListener('livewire:update', function() {
+            setTimeout(function() {
+                if (document.getElementById('my-video')) {
+                    initializeVideoPlayer();
+                }
+            }, 100);
+        });
+    </script>
 </div>
