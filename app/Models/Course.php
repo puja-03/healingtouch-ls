@@ -19,6 +19,7 @@ class Course extends Model
         'slug',
         'description',
         'price',
+        'image',
         'is_published',
         'user_id',
     ];

@@ -1,6 +1,6 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen">
     <div class="px-4 py-8">
-        <div class="max-w-6xl mx-auto">
+        <div class="w-full">
             <!-- Header -->
             <div class="mb-8">
                 <a href="{{ route('home') }}" class="text-pink-600 hover:underline text-sm mb-4 inline-block">
