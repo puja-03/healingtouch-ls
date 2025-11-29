@@ -1,23 +1,20 @@
 <div class="min-h-screen">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <!-- Main Content -->
-        <div class="lg:col-span-3">
+       <div class="lg:col-span-3">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <!-- Video Player -->
                 <div class="bg-black aspect-video flex items-center justify-center">
                     @if($videoUrl)
-                        <!-- Video.js Player -->
                         <video 
-                            id="my-video"
-                            class="video-js vjs-default-skin w-full h-full"
+                            id="courseVideo"
+                            class="w-full h-full"
                             controls
-                            preload="auto"
-                            data-setup='{}'>
+                            controlsList="nodownload"
+                            style="background: #000;"
+                            oncontextmenu="return false;">
                             <source src="{{ $videoUrl }}" type="video/mp4">
-                            <p class="vjs-no-js">
-                                To view this video please enable JavaScript, and consider upgrading to a
-                                web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-                            </p>
+                            Your browser does not support the video tag.
                         </video>
                     @else
                         <div class="text-white text-center">
@@ -46,14 +43,15 @@
             </div>
         </div>
 
+
         <!-- Sidebar - Chapters & Topics -->
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden sticky top-6">
-                <div class="bg-gradient-to-r from-pink-600 to-pink-700 p-4">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 p-4">
                     <h3 class="text-white font-bold text-lg">
                         <i class="fas fa-list mr-2"></i>{{ $course->title }}
                     </h3>
-                    <p class="text-pink-100 text-xs mt-1">
+                    <p class="text-blue-100 text-xs mt-1">
                         {{ $course->chapters->count() }} chapters • 
                         {{ $course->chapters->sum(fn($c) => $c->topics->count()) }} topics
                     </p>
