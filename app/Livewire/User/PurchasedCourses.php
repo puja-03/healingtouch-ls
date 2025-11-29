@@ -25,13 +25,6 @@ class PurchasedCourses extends Component
         $this->resetPage();
     }
 
-    public function selectCourse($enrollmentId)
-    {
-        $this->selectedCourse = Enrollment::where('user_id', auth()->id())
-            ->with('course')
-            ->findOrFail($enrollmentId);
-    }
-
     public function closeCourseDetail()
     {
         $this->selectedCourse = null;

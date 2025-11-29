@@ -39,24 +39,6 @@ use App\Livewire\Instructor\Profile\ProfileForm;
 Route::get('/', Homepage::class)->name('home');
 Route::get('/login', Login::class)->name('login')->middleware('guest');
 Route::get('/register', Register::class)->name('register')->middleware('guest');
-Route::get('/courses/{id}', function ($id) {
-    if (auth()->check()) {
-        $enrolled = \App\Models\Enrollment::where('user_id', auth()->id())
-            ->where('course_id', $id)
-            ->where('status', 'completed')
-            ->exists();
-
-        if ($enrolled) {
-            $course = \App\Models\Course::find($id);
-            if ($course) {
-                return redirect()->route('user.play-course', ['course' => $course->slug]);
-            }
-        }
-        return redirect()->route('user.courses');
-    }
-    return redirect()->route('login', ['intended' => url()->current()]);
-})->where('id', '[0-9]+');
-
 Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
 Route::get('/course/{course}/checkout', [PaymentController::class, 'showCheckout'])->name('payment.checkout');
 Route::post('/create-order', [PaymentController::class, 'createOrder'])->name('payment.create-order');

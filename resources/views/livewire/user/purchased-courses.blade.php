@@ -2,7 +2,7 @@
     <div class=" px-4 py-8">
         <div class="flex items-center justify-between mb-8">
             <h1 class="text-3xl font-bold">My Learning Dashboard</h1>
-            <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-pink-700">
+            <a href="/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                 Browse More Courses
             </a>
         </div>
@@ -56,47 +56,4 @@
             {{ $enrollments->links() }}
         </div>
     </div>
-
-    {{-- Course Content Modal --}}
-    @if($selectedCourse)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                <div class="sticky top-0 bg-white border-b p-6 flex items-center justify-between">
-                    <h2 class="text-2xl font-bold">{{ $selectedCourse->course->title }}</h2>
-                    <button wire:click="closeCourseDetail" class="text-gray-500 hover:text-gray-700 text-2xl">✕</button>
-                </div>
-
-                <div class="p-6">
-                    {{-- Chapters and Topics --}}
-                    <div class="space-y-4">
-                        @foreach($selectedCourse->course->chapters as $chapter)
-                            <div class="border rounded-lg">
-                                <div class="bg-gray-50 p-4 font-semibold text-gray-900">
-                                    {{ $chapter->chapter_title }}
-                                </div>
-                                <div class="p-4 space-y-2">
-                                    @foreach($chapter->topics as $topic)
-                                        <div class="flex items-center gap-3 p-3 bg-gray-50 rounded">
-                                            <span class="text-pink-600">▶️</span>
-                                            <div class="flex-1">
-                                                <p class="font-medium text-gray-900">{{ $topic->topic_title }}</p>
-                                                <p class="text-xs text-gray-500">
-                                                    @if($topic->video_url)
-                                                        <a href="{{ $topic->video_url }}" target="_blank" class="text-blue-600 hover:underline">Watch Video</a>
-                                                    @else
-                                                        No video available
-                                                    @endif
-                                                </p>
-                                            </div>
-                                            <input type="checkbox" class="rounded border-gray-300 text-pink-600">
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
 </div>

@@ -18,9 +18,6 @@ class Enrollment extends Model
         'user_id',
         'course_id',
         'payment_id',
-        'razorpay_order_id',
-        'razorpay_payment_id',
-        'razorpay_signature',
         'amount',
         'currency',
         'status', // pending, completed, failed

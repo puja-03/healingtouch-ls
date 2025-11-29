@@ -70,14 +70,6 @@
 
                         <!-- CTA Button -->
                         <div class="mb-6">
-                            {{-- @auth
-                                <livewire:public.course-checkout :course-id="$course->id" />
-                            @else
-                                <a href="{{ route('login', ['intended' => request()->url()]) }}" 
-                                   class="block text-center px-4 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-semibold">
-                                    <i class="fas fa-lock mr-2"></i>Login to Enroll
-                                </a>
-                           @endauth --}}
                             @auth
                                 @php
                                     // Consider any enrollment record as enrolled (ignore enrollment status)
