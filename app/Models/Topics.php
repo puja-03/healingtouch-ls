@@ -21,7 +21,8 @@ class Topics extends Model
         'content',
         'video_url',
         'order_index',
-        'is_completed'
+        'is_completed',
+        'attachments'
     ];
 
     protected $casts = [

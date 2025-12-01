@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('video_url')->nullable(); 
             $table->integer('order_index')->default(0); 
             $table->boolean('is_completed')->default(false);
+            $table->json('attachments')->nullable();
             $table->timestamps();
         });
     }
