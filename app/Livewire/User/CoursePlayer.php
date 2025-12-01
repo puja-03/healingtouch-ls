@@ -9,7 +9,6 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 
 #[Title('Course Player')]
-// #[Layout('components.layouts.user')]
 class CoursePlayer extends Component
 {
     public $course;
@@ -59,14 +58,12 @@ class CoursePlayer extends Component
 
     public function toggleChapter($chapterId)
     {
-        // If clicking same chapter, close it. Else open new chapter
         $this->expandedChapterId = $this->expandedChapterId === $chapterId ? null : $chapterId;
     }
 
     public function selectTopic($topicId)
     {
         $this->selectedTopicId = $topicId;
-
         // Find the topic and set video URL
         foreach ($this->course->chapters as $chapter) {
             foreach ($chapter->topics as $topic) {

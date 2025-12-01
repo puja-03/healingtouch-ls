@@ -19,6 +19,8 @@ class TopicForm extends Component
     public $editingId = null;
     public $video;
     public $currentVideo;
+    public $attachments = []; // Add this for multiple file uploads
+    public $currentAttachments = []; // For existing attachments when editing
 
     public $topic_title = '';
     public $content = '';
@@ -31,6 +33,7 @@ class TopicForm extends Component
             'content' => 'nullable|string',
             'order_index' => 'required|integer|min:1',
             'video' => 'nullable|file|mimetypes:video/mp4,video/quicktime|max:102400', // 100MB
+            'attachments.*' => 'nullable|file|max:51200', // 50MB per file
         ];
     }
 
@@ -41,6 +44,7 @@ class TopicForm extends Component
         'order_index.min' => 'Order index must be at least 1.',
         'video.mimetypes' => 'Only MP4 and MOV video formats are allowed.',
         'video.max' => 'Video size must not exceed 100MB.',
+        'attachments.*.max' => 'Each attachment must not exceed 50MB.',
     ];
 
     public function mount($chapterId, $editingId = null)
@@ -65,6 +69,11 @@ class TopicForm extends Component
             $this->content = $topic->content;
             $this->order_index = $topic->order_index;
             $this->currentVideo = $topic->video_url;
+            
+            // Load existing attachments
+            if ($topic->attachments) {
+                $this->currentAttachments = json_decode($topic->attachments, true);
+            }
             
         } catch (\Exception $e) {
             Log::error('Error loading topic: ' . $e->getMessage());
@@ -98,8 +107,22 @@ class TopicForm extends Component
 
             // Handle video upload
             if ($this->video) {
-                $topicData['video_url'] = $this->uploadVideo();
+                $topicData['video_url'] = $this->uploadVideo($this->video, 'videos');
                 Log::info('Video uploaded successfully');
+            }
+
+            // Handle attachments upload
+            $uploadedAttachments = [];
+            if ($this->attachments) {
+                foreach ($this->attachments as $attachment) {
+                    $attachmentUrl = $this->uploadAttachment($attachment, 'attachments');
+                    $uploadedAttachments[] = [
+                        'name' => $attachment->getClientOriginalName(),
+                        'url' => $attachmentUrl,
+                        'size' => $attachment->getSize(),
+                        'type' => $attachment->getMimeType(),
+                    ];
+                }
             }
 
             if ($this->editingId) {
@@ -114,14 +137,23 @@ class TopicForm extends Component
 
                 // Delete old video if new one is uploaded
                 if ($this->video && $topic->video_url) {
-                    $this->deleteOldVideo($topic->video_url);
+                    $this->deleteOldFile($topic->video_url);
                 }
+
+                // Merge existing attachments with new ones
+                $existingAttachments = $topic->attachments ? json_decode($topic->attachments, true) : [];
+                $allAttachments = array_merge($existingAttachments, $uploadedAttachments);
+                $topicData['attachments'] = !empty($allAttachments) ? json_encode($allAttachments) : null;
                 
                 $topic->update($topicData);
                 $message = 'Topic updated successfully.';
                 Log::info('Topic updated:', ['id' => $topic->id]);
             } else {
                 // Create new topic
+                if (!empty($uploadedAttachments)) {
+                    $topicData['attachments'] = json_encode($uploadedAttachments);
+                }
+                
                 $topic = Topics::create($topicData);
                 $message = 'Topic created successfully.';
                 Log::info('Topic created:', ['id' => $topic->id]);
@@ -142,52 +174,100 @@ class TopicForm extends Component
         }
     }
 
-    protected function uploadVideo()
+    protected function uploadVideo($file, $type = 'videos')
+    {
+        return $this->uploadToDigitalOcean($file, $type);
+    }
+
+    protected function uploadAttachment($file, $type = 'attachments')
+    {
+        return $this->uploadToDigitalOcean($file, $type);
+    }
+
+    protected function uploadToDigitalOcean($file, $type = 'files')
     {
         try {
             $chapter = Chapters::findOrFail($this->chapterId);
             $courseFolder = Str::slug($chapter->course->title ?? 'course');
             $chapterFolder = Str::slug($chapter->chapter_title);
+            $topicFolder = Str::slug($this->topic_title);
             
-            $fileName = time() . '_' . Str::random(10) . '.' . $this->video->getClientOriginalExtension();
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time() . '_' . Str::random(10) . '_' . Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $extension;
 
-            Log::info('Uploading video:', [
+            Log::info('Uploading to DigitalOcean:', [
                 'fileName' => $fileName,
                 'courseFolder' => $courseFolder,
                 'chapterFolder' => $chapterFolder,
+                'topicFolder' => $topicFolder,
+                'type' => $type,
             ]);
 
             // Upload to DigitalOcean Spaces
-            $path = $this->video->storeAs(
-                "videos/{$courseFolder}/{$chapterFolder}",
+            $path = $file->storeAs(
+                "{$type}/{$courseFolder}/{$chapterFolder}/{$topicFolder}",
                 $fileName,
                 'do_spaces'
             );
 
             if (!Storage::disk('do_spaces')->exists($path)) {
-                throw new \Exception('Failed to upload video to storage');
+                throw new \Exception('Failed to upload file to storage');
             }
 
             $url = Storage::disk('do_spaces')->url($path);
-            Log::info('Video uploaded successfully:', ['url' => $url]);
+            Log::info('File uploaded successfully:', ['url' => $url]);
             
             return $url;
         } catch (\Exception $e) {
-            Log::error('Video upload error: ' . $e->getMessage());
-            throw new \Exception('Video upload failed: ' . $e->getMessage());
+            Log::error('File upload error: ' . $e->getMessage());
+            throw new \Exception('File upload failed: ' . $e->getMessage());
         }
     }
 
-    protected function deleteOldVideo($videoUrl)
+    // Method to remove an existing attachment
+    public function removeAttachment($index)
+    {
+        if (isset($this->currentAttachments[$index])) {
+            $attachment = $this->currentAttachments[$index];
+            
+            // Delete from storage
+            $this->deleteOldFile($attachment['url']);
+            
+            // Remove from array
+            unset($this->currentAttachments[$index]);
+            $this->currentAttachments = array_values($this->currentAttachments); // Reindex array
+            
+            // Update the topic with remaining attachments
+            if ($this->editingId) {
+                $topic = Topics::find($this->editingId);
+                if ($topic) {
+                    $topic->attachments = !empty($this->currentAttachments) ? json_encode($this->currentAttachments) : null;
+                    $topic->save();
+                }
+            }
+        }
+    }
+
+    // Method to remove a newly uploaded attachment
+    public function removeNewAttachment($index)
+    {
+        if (isset($this->attachments[$index])) {
+            unset($this->attachments[$index]);
+            $this->attachments = array_values($this->attachments); // Reindex array
+        }
+    }
+
+    protected function deleteOldFile($fileUrl)
     {
         try {
-            $path = parse_url($videoUrl, PHP_URL_PATH);
+            $path = parse_url($fileUrl, PHP_URL_PATH);
             if ($path) {
                 Storage::disk('do_spaces')->delete(ltrim($path, '/'));
-                Log::info('Old video deleted:', ['path' => $path]);
+                Log::info('Old file deleted:', ['path' => $path]);
             }
         } catch (\Exception $e) {
-            Log::warning('Failed to delete old video: ' . $e->getMessage());
+            Log::warning('Failed to delete old file: ' . $e->getMessage());
         }
     }
 
@@ -198,6 +278,8 @@ class TopicForm extends Component
         $this->order_index = 1;
         $this->video = null;
         $this->currentVideo = null;
+        $this->attachments = [];
+        $this->currentAttachments = [];
         $this->editingId = null;
     }
 

@@ -24,6 +24,8 @@ class Chapters extends Model
 
     protected $casts = [
         'order_index' => 'integer',
+        'attachments' => 'array', // Cast to array
+        'is_completed' => 'boolean',
     ];
 
     // Auto-generate slug from title
