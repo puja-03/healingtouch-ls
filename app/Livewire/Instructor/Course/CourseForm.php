@@ -98,12 +98,7 @@ class CourseForm extends Component
     {
         $this->resetForm();
         $this->editingId = null;
-        
-        // Option 1: Use dispatch for events (Livewire v3)
         $this->dispatch('course-cancelled');
-        
-        // Option 2: Simply reset without event
-        // No action needed beyond the reset above
     }
 
     public function render()
