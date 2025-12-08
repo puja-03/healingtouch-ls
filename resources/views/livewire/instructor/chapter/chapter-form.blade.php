@@ -68,7 +68,7 @@
                     </button>
                     <button type="submit" 
                             wire:loading.attr="disabled"
-                            class="px-6 py-2.5 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition disabled:opacity-50 flex items-center">
+                            class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center">
                         <span wire:loading.remove wire:target="save">
                             {{ $editingId ? 'Update Chapter' : 'Create Chapter' }}
                         </span>

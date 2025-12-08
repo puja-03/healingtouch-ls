@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('chapters_id')->constrained()->onDelete('cascade'); 
             $table->string('topic_title');
-            $table->text('topic_slug')->unique();
+            $table->string('topic_slug')->unique();
             $table->text('content')->nullable(); 
             $table->string('video_url')->nullable(); 
             $table->integer('order_index')->default(0); 

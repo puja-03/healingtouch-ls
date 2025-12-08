@@ -4,7 +4,7 @@
         <div class="flex items-center gap-2">
             <input type="text" wire:model.debounce.300ms="search" placeholder="Search courses..."
                 class="rounded-lg border-gray-300 px-3 py-2" />
-            <button wire:click="create" class="px-4 py-2 bg-pink-600 text-white rounded-lg">+ New Course</button>
+            <button wire:click="create" class="px-4 py-2 bg-blue-600 text-white rounded-lg">+ New Course</button>
         </div>
     </div>
 
@@ -77,7 +77,7 @@
                                     Delete
                                 </button>
                                 <!-- Updated: Use course slug -->
-                                <a href="{{ route('instructor.chapter', $course->slug) }}" class="text-white bg-gray-500 px-2 py-1 rounded-md">
+                                <a href="{{ route('instructor.chapter', $course->slug) }}" class="text-white bg-blue-500 px-2 py-1 rounded-md">
                                     Chapters
                                 </a>
                             </div>

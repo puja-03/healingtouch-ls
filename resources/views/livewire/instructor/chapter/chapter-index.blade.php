@@ -8,7 +8,7 @@
         <div class="flex items-center gap-2">
             <input type="text" wire:model.debounce.300ms="search" placeholder="Search chapters..."
                    class="rounded-lg border-gray-300 px-3 py-2 border" />
-            <button wire:click="create" class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">+ New Chapter</button>
+            <button wire:click="create" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">+ New Chapter</button>
         </div>
     </div>
 
