@@ -37,7 +37,8 @@
                 @endif
                 {{-- List Container: Grid ko hata kar simple vertical stack use kiya hai (space-y-3) --}}
                 <div class="space-y-3 p-6">
-                    @foreach (json_decode($selectedTopic->attachments, true) as $attachment)
+                    @foreach (json_decode($selectedTopic->attachments ?? '[]', true) ?? [] as $attachment)
+
                         {{-- Item Container: File details aur Download button ko flex mein rakha hai. 'group' class added for internal hover effects. --}}
                         <div
                             class="flex items-center justify-between p-3 border border-gray-200 rounded-lg shadow-sm bg-white hover:border-blue-300 transition group">
