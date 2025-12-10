@@ -5,6 +5,7 @@ use App\Livewire\Auth\Register;
 use App\Livewire\User\Dashboard As UserDashboard;
 use App\Livewire\Public\CourseDetail;
 use App\Livewire\User\PurchasedCourses;
+use App\Livewire\User\CoursePlayer;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -42,6 +43,8 @@ Route::get('/courses/{course:slug}', CourseDetail::class)->name('courses.show');
 Route::get('/course/{course}/checkout', [PaymentController::class, 'showCheckout'])->name('payment.checkout');
 Route::post('/create-order', [PaymentController::class, 'createOrder'])->name('payment.create-order');
 Route::post('/payment/success', [PaymentController::class, 'handleSuccess'])->name('payment.success');
+Route::get('/course/{course:slug}',CoursePlayer::class)->name('user.play-course');
+
 
 Route::post('/logout', function (Request $request) {
 	Auth::logout();
@@ -96,7 +99,6 @@ Route::middleware('auth')->group(function () {
     Route::middleware(UserMiddleware::class)->prefix('user')->group(function () {
         Route::get('/purchased-courses', PurchasedCourses::class)->name('user.courses');
         Route::get('/dashboard',UserDashboard::class)->name('user.dashboard');
-        Route::get('/course/{course:slug}', \App\Livewire\User\CoursePlayer::class)->name('user.play-course');
     });
 
 });

@@ -239,7 +239,7 @@
                         class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50">
                         Cancel
                     </button>
-                    <button type="submit" wire:loading.attr="disabled"
+                    <button wire:submit.prevent="save" wire:loading.attr="disabled"
                         class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center">
                         <span wire:loading.remove wire:target="save">
                             {{ $editingId ? 'Update Topic' : 'Create Topic' }}

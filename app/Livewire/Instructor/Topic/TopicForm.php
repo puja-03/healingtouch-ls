@@ -10,7 +10,10 @@ use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Title;
+use Illuminate\Http\File;   
 
+#[Title('Topic Form')]
 class TopicForm extends Component
 {
     use WithFileUploads;
@@ -19,8 +22,8 @@ class TopicForm extends Component
     public $editingId = null;
     public $video;
     public $currentVideo;
-    public $attachments = []; // Add this for multiple file uploads
-    public $currentAttachments = []; // For existing attachments when editing
+    public $attachments = []; 
+    public $currentAttachments = []; 
 
     public $topic_title = '';
     public $content = '';
@@ -124,9 +127,8 @@ class TopicForm extends Component
                     ];
                 }
             }
-
+            // Merge attachments if editing
             if ($this->editingId) {
-                // Update existing topic
                 $topic = Topics::where('chapters_id', $this->chapterId)
                     ->where('id', $this->editingId)
                     ->first();
@@ -158,13 +160,8 @@ class TopicForm extends Component
                 $message = 'Topic created successfully.';
                 Log::info('Topic created:', ['id' => $topic->id]);
             }
-
-            // Reset form
             $this->resetForm();
-            
-            // Dispatch success event
             $this->dispatch('topic-saved', message: $message);
-            
             return true;
             
         } catch (\Exception $e) {
@@ -174,10 +171,56 @@ class TopicForm extends Component
         }
     }
 
-    protected function uploadVideo($file, $type = 'videos')
-    {
-        return $this->uploadToDigitalOcean($file, $type);
+    // protected function uploadVideo($file, $type = 'videos')
+    // {
+    //     return $this->uploadToDigitalOcean($file, $type);
+    // }
+    protected function uploadVideo($file)
+{
+    try {
+
+        // 1. Temporary original file
+        $tempPath = $file->getRealPath();
+
+        // 2. Temporary converted file path (local)
+        $convertedFileName = time() . '_converted.mp4';
+        $convertedPath = storage_path('app/' . $convertedFileName);
+
+        // 3. Convert to H.265 (HEVC)
+        $command = "ffmpeg -i \"$tempPath\" -vcodec libx265 -crf 28 -preset medium -acodec aac \"$convertedPath\" -y";
+        exec($command);
+
+        if (!file_exists($convertedPath)) {
+            throw new \Exception('Video conversion failed — ffmpeg output file missing.');
+        }
+
+        // 4. Prepare folder path
+        $chapter = Chapters::findOrFail($this->chapterId);
+        $courseFolder = Str::slug($chapter->course->title ?? 'course');
+        $chapterFolder = Str::slug($chapter->chapter_title);
+        $topicFolder = Str::slug($this->topic_title);
+
+        // 5. Upload converted file to DigitalOcean Spaces
+        $finalName = time() . '_hevc.mp4';
+
+        $path = Storage::disk('do_spaces')->putFileAs(
+            "videos/$courseFolder/$chapterFolder/$topicFolder",
+            new File($convertedPath),
+            $finalName,
+            'public'
+        );
+
+        // 6. Remove local converted file
+        unlink($convertedPath);
+
+        return Storage::disk('do_spaces')->url($path);
+
+    } catch (\Exception $e) {
+        Log::error("Video conversion/upload error: " . $e->getMessage());
+        throw new \Exception("Video upload failed: " . $e->getMessage());
     }
+}
+
 
     protected function uploadAttachment($file, $type = 'attachments')
     {
@@ -254,7 +297,7 @@ class TopicForm extends Component
     {
         if (isset($this->attachments[$index])) {
             unset($this->attachments[$index]);
-            $this->attachments = array_values($this->attachments); // Reindex array
+            $this->attachments = aClickrray_values($this->attachments); // Reindex array
         }
     }
 

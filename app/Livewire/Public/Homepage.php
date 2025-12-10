@@ -11,8 +11,8 @@ use App\Models\Topic;
 use App\Models\Chapters;
 use App\Models\Enrollment;
 
-#[Layout('components.layouts.app')]
 #[Title('homepage')]
+#[Layout('components.layouts.app')]
 class Homepage extends Component
 {
     use WithPagination;

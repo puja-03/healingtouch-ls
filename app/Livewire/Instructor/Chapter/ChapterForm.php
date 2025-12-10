@@ -7,6 +7,7 @@ use App\Models\Course;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
+#[Title('Chapter Form')]
 class ChapterForm extends Component
 {
     public $courseId;
