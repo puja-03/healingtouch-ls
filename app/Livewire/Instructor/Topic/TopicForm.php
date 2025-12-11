@@ -17,7 +17,6 @@ use Illuminate\Http\File;
 class TopicForm extends Component
 {
     use WithFileUploads;
-
     public $chapterId;
     public $editingId = null;
     public $video;
@@ -171,55 +170,55 @@ class TopicForm extends Component
         }
     }
 
-    // protected function uploadVideo($file, $type = 'videos')
-    // {
-    //     return $this->uploadToDigitalOcean($file, $type);
-    // }
-    protected function uploadVideo($file)
-{
-    try {
-
-        // 1. Temporary original file
-        $tempPath = $file->getRealPath();
-
-        // 2. Temporary converted file path (local)
-        $convertedFileName = time() . '_converted.mp4';
-        $convertedPath = storage_path('app/' . $convertedFileName);
-
-        // 3. Convert to H.265 (HEVC)
-        $command = "ffmpeg -i \"$tempPath\" -vcodec libx265 -crf 28 -preset medium -acodec aac \"$convertedPath\" -y";
-        exec($command);
-
-        if (!file_exists($convertedPath)) {
-            throw new \Exception('Video conversion failed — ffmpeg output file missing.');
-        }
-
-        // 4. Prepare folder path
-        $chapter = Chapters::findOrFail($this->chapterId);
-        $courseFolder = Str::slug($chapter->course->title ?? 'course');
-        $chapterFolder = Str::slug($chapter->chapter_title);
-        $topicFolder = Str::slug($this->topic_title);
-
-        // 5. Upload converted file to DigitalOcean Spaces
-        $finalName = time() . '_hevc.mp4';
-
-        $path = Storage::disk('do_spaces')->putFileAs(
-            "videos/$courseFolder/$chapterFolder/$topicFolder",
-            new File($convertedPath),
-            $finalName,
-            'public'
-        );
-
-        // 6. Remove local converted file
-        unlink($convertedPath);
-
-        return Storage::disk('do_spaces')->url($path);
-
-    } catch (\Exception $e) {
-        Log::error("Video conversion/upload error: " . $e->getMessage());
-        throw new \Exception("Video upload failed: " . $e->getMessage());
+    protected function uploadVideo($file, $type = 'videos')
+    {
+        return $this->uploadToDigitalOcean($file, $type);
     }
-}
+// protected function uploadVideo($file)
+// {
+//     try {
+
+//         // 1. Temporary original file
+//         $tempPath = $file->getRealPath();
+
+//         // 2. Temporary converted file path (local)
+//         $convertedFileName = time() . '_converted.mp4';
+//         $convertedPath = storage_path('app/' . $convertedFileName);
+
+//         // 3. Convert to H.265 (HEVC)
+//         $command = "ffmpeg -i \"$tempPath\" -vcodec libx265 -crf 28 -preset medium -acodec aac \"$convertedPath\" -y";
+//         exec($command);
+
+//         if (!file_exists($convertedPath)) {
+//             throw new \Exception('Video conversion failed — ffmpeg output file missing.');
+//         }
+
+//         // 4. Prepare folder path
+//         $chapter = Chapters::findOrFail($this->chapterId);
+//         $courseFolder = Str::slug($chapter->course->title ?? 'course');
+//         $chapterFolder = Str::slug($chapter->chapter_title);
+//         $topicFolder = Str::slug($this->topic_title);
+
+//         // 5. Upload converted file to DigitalOcean Spaces
+//         $finalName = time() . '_hevc.mp4';
+
+//         $path = Storage::disk('do_spaces')->putFileAs(
+//             "videos/$courseFolder/$chapterFolder/$topicFolder",
+//             new File($convertedPath),
+//             $finalName,
+//             'public'
+//         );
+
+//         // 6. Remove local converted file
+//         unlink($convertedPath);
+
+//         return Storage::disk('do_spaces')->url($path);
+
+//     } catch (\Exception $e) {
+//         Log::error("Video conversion/upload error: " . $e->getMessage());
+//         throw new \Exception("Video upload failed: " . $e->getMessage());
+//     }
+// }
 
 
     protected function uploadAttachment($file, $type = 'attachments')
